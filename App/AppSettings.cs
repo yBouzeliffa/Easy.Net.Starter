@@ -1,6 +1,6 @@
 ﻿namespace Easy.Net.Starter.App
 {
-    public class AppSettings
+    public partial class AppSettings
     {
         public string OverrideWriteLogToFile { get; set; }
         public LoggingSection Logging { get; set; }

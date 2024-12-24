@@ -7,27 +7,6 @@ using System.Diagnostics;
 
 namespace Easy.Net.Starter.App
 {
-    //public enum RequireService
-    //{
-    //    [Description("ServerTcp")]
-    //    ServerTcp = 0,
-
-    //    [Description("FileWriter")]
-    //    FileWrite = 1,
-
-    //    [Description("ClientWorker")]
-    //    ClientWorker = 2,
-
-    //    [Description("ServerWorker")]
-    //    ServerWorker = 3,
-
-    //    [Description("TcpStreamReader")]
-    //    TcpStreamReader = 4,
-
-    //    [Description("ClientTcp")]
-    //    ClientTcp = 5
-    //}
-
     public static class DependanciesRegistrator
     {
         public static IConfiguration? RegisterConfiguration(EmbeddedRessource specificAppsettings)
@@ -69,7 +48,6 @@ namespace Easy.Net.Starter.App
                     var configurationSettings = new AppSettings();
                     configuration.Bind(configurationSettings); // Bind appsettings info to data model
                     serviceCollection.AddSingleton(configurationSettings);
-
 
                     string appName = Process.GetCurrentProcess().ProcessName;
 
