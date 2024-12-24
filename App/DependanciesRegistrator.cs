@@ -16,10 +16,8 @@ namespace Easy.Net.Starter.App
                 var appsettingsFromMemory = EmbeddedRessource.Appsettings.GetDescription().FindAndGetFileFromEmbeddedResource("Globals.Tools");
                 var appsettingsApplicationFromMemory = specificAppsettings.GetDescription().FindAndGetFileFromEmbeddedResource("Globals.Tools");
 
-                if (appsettingsFromMemory == null || appsettingsApplicationFromMemory == null)
-                {
-                    throw new ArgumentNullException(nameof(appsettingsFromMemory));
-                }
+                ArgumentNullException.ThrowIfNull(appsettingsFromMemory, nameof(appsettingsFromMemory));
+                ArgumentNullException.ThrowIfNull(appsettingsApplicationFromMemory, nameof(appsettingsApplicationFromMemory));
 
                 IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                     .AddJsonStream(appsettingsFromMemory)
@@ -64,13 +62,14 @@ namespace Easy.Net.Starter.App
                 foreach (var service in requiredSingletonServices)
                 {
                     var fullname = service.GetNamespaceFromClass();
-                    if (fullname != null)
+                    var assembly = service.GetAssemblyFromClass();
+                    if (fullname != null && assembly != null)
                     {
-                        Type type = Type.GetType(fullname);
+                        Type type = assembly.GetType(fullname);
 
                         if (type == null)
                         {
-                            Console.WriteLine($"Type {fullname} non trouvé.");
+                            Log.Logger.Information($"Type {fullname} non trouvé.");
                             continue;
                         }
 
@@ -81,17 +80,18 @@ namespace Easy.Net.Starter.App
                 foreach (var service in requiredScopedServices)
                 {
                     var fullname = service.GetNamespaceFromClass();
-                    if (fullname != null)
+                    var assembly = service.GetAssemblyFromClass();
+                    if (fullname != null && assembly != null)
                     {
-                        Type type = Type.GetType(fullname);
+                        Type type = assembly.GetType(fullname);
 
                         if (type == null)
                         {
-                            Console.WriteLine($"Type {fullname} non trouvé.");
+                            Log.Logger.Information($"Type {fullname} non trouvé.");
                             continue;
                         }
 
-                        serviceCollection.AddTransient(type);
+                        serviceCollection.AddScoped(type);
                     }
                 }
 
@@ -99,8 +99,7 @@ namespace Easy.Net.Starter.App
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Unable to compile the services");
-                Console.WriteLine(ex.ToString());
+                Log.Logger.Information(ex, "Unable to compile the services");
                 return null;
             }
         }

@@ -69,6 +69,27 @@ namespace Easy.Net.Starter.App
             Log.Logger.Information("Application Capabilities registered");
         }
 
+        private readonly static string CORS_API = "CORS_API";
+        public static void RegisterCors(this IServiceCollection services, AppSettings appSettings)
+        {
+            var allowedOrigins = appSettings.AllowedOrigins.Split(',');
+            var allowedMethods = appSettings.AllowedMethods.Split(',');
+            var allowedHeaders = appSettings.AllowedHeaders.Split(',');
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CORS_API,
+                    builder => builder.WithMethods(allowedMethods).WithHeaders(allowedHeaders).WithOrigins(allowedOrigins));
+            });
+
+            Log.Logger.Information("Cors registered");
+        }
+
+        public static void UseAppCors(this WebApplication webApplication)
+        {
+            webApplication.UseCors(CORS_API);
+        }
+
         private static Dictionary<string, string> ParseConnectionString(string connectionString)
         {
             var parts = connectionString.Split(';')

@@ -22,6 +22,34 @@ namespace Easy.Net.Starter.Extensions
             return null;
         }
 
+        public static Assembly? GetAssemblyFromClass(this string className)
+        {
+            try
+            {
+                Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                foreach (Assembly assembly in assemblies)
+                {
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        if (type.Name == className)
+                        {
+                            return assembly;
+                        }
+                    }
+                }
+
+                Console.WriteLine("The specified class was not found in the loaded assemblies.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error has occurred: " + ex.Message);
+                return null;
+            }
+        }
+
+
         public static string? GetNamespaceFromClass(this string className)
         {
             try
