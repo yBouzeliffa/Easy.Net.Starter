@@ -9,7 +9,7 @@ namespace Easy.Net.Starter.ProgramsEntries
 {
     public static class WebApiStarter
     {
-        public static void Start<T>(string[] args, string[] singletonServices, string[] scopedServices) where T : DbContext
+        public static void Start<T>(string[] args, StartupOptions options) where T : DbContext
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -29,10 +29,20 @@ namespace Easy.Net.Starter.ProgramsEntries
             Log.Logger.Information($"Version : {appSettings.Version}");
             Log.Logger.Information("");
 
-            builder.Services.RegisterDatabase<T>(appSettings);
+            if (options.WithDatabase)
+                builder.Services.RegisterDatabase<T>(appSettings);
+
             builder.Services.RegisterApiCapabilities(appSettings);
             builder.Services.RegisterCors(appSettings);
-            //todo services ?
+
+            ApplicationRegistrator.RegisterServices(
+                builder.Services,
+                options.SingletonServices,
+                options.ScopedServices,
+                options.TransientServices,
+                options.SingletonsWithInterfaces,
+                options.ScopedWithInterfaces,
+                options.TransientsWithInterfaces);
 
             var app = builder.Build();
 
@@ -42,7 +52,7 @@ namespace Easy.Net.Starter.ProgramsEntries
             });
 
             app.RegisterApplicationCapabilities(appName);
-            //todo middleware ?
+            app.RegisterMiddlewares(options.Middlewares);
             app.RegisterExceptionHandler(appSettings);
             app.UseAppCors();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Easy.Net.Starter.Extensions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +60,7 @@ namespace Easy.Net.Starter.App
             application.UseAuthentication();
             application.UseAuthorization();
             application.MapControllers();
+            application.MapOpenApi();
             application.MapScalarApiReference(options =>
             {
                 options
@@ -84,10 +86,34 @@ namespace Easy.Net.Starter.App
 
             Log.Logger.Information("Cors registered");
         }
-
         public static void UseAppCors(this WebApplication webApplication)
         {
             webApplication.UseCors(CORS_API);
+        }
+
+        public static void RegisterMiddlewares(this IApplicationBuilder application, string[] middlewareNames)
+        {
+            foreach (var name in middlewareNames)
+            {
+                var fullname = name.GetNamespaceFromClass();
+                var assembly = name.GetAssemblyFromClass();
+
+                if (fullname != null && assembly != null)
+                {
+                    Type type = assembly.GetType(fullname);
+
+                    if (type == null)
+                    {
+                        Log.Logger.Information($"Type {fullname} non trouvé.");
+                        continue;
+                    }
+
+                    application.UseMiddleware(type);
+                    Log.Logger.Information($"Middleware {fullname} enregistré avec succès.");
+                }
+            }
+
+            Log.Logger.Information("Tous les middlewares ont été enregistrés.");
         }
 
         private static Dictionary<string, string> ParseConnectionString(string connectionString)
