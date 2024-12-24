@@ -1,0 +1,5 @@
+﻿dotnet pack -c Release
+
+cd ./bin/Release/
+
+dotnet nuget push Easy.Net.Starter.1.0.1.nupkg -k {API_KEY} -s https://api.nuget.org/v3/index.json

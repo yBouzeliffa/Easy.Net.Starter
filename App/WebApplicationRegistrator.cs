@@ -1,0 +1,84 @@
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Scalar.AspNetCore;
+using Serilog;
+
+namespace Easy.Net.Starter.App
+{
+    public static class WebApplicationRegistrator
+    {
+        public static void RegisterSerilog(this ConfigureHostBuilder host, IConfiguration configuration)
+        {
+            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
+            host.UseSerilog();
+        }
+
+        public static AppSettings RegisterAppSettings(this IServiceCollection services, IConfiguration configuration)
+        {
+            var configurationSettings = new AppSettings();
+            configuration.Bind(configurationSettings); // Bind appsettings info to data model
+            services.AddSingleton(configurationSettings);
+
+            Log.Logger.Information("Configuration registered");
+
+            return configurationSettings;
+        }
+
+        public static void RegisterDatabase<T>(this IServiceCollection services, AppSettings appSettings) where T : DbContext
+        {
+            var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+
+            Log.Logger.Information("[Database] Database server: {0}", connectionParts["Host"]);
+            Log.Logger.Information("[Database] Database: {0}", connectionParts["Database"]);
+            Log.Logger.Information("[Database] Port: {0}", connectionParts["Port"]);
+            Log.Logger.Information("");
+
+            services.AddDbContext<T>(options =>
+            {
+                options.UseNpgsql(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL).UseSnakeCaseNamingConvention();
+            });
+
+            Log.Logger.Information("Database registered");
+        }
+
+        public static void RegisterApiCapabilities(this IServiceCollection services, AppSettings appSettings)
+        {
+            services.AddControllers();
+            services.AddLogging();
+            services.AddEndpointsApiExplorer();
+            services.AddOpenApi();
+
+            Log.Logger.Information("Api Capabilities registered");
+        }
+
+        public static void RegisterApplicationCapabilities(this WebApplication application, string apiName)
+        {
+            application.UseHttpsRedirection();
+            application.UseAuthentication();
+            application.UseAuthorization();
+            application.MapControllers();
+            application.MapScalarApiReference(options =>
+            {
+                options
+                    .WithTitle(apiName)
+                    .WithTheme(ScalarTheme.Saturn);
+            });
+
+            Log.Logger.Information("Application Capabilities registered");
+        }
+
+        private static Dictionary<string, string> ParseConnectionString(string connectionString)
+        {
+            var parts = connectionString.Split(';')
+                .Select(part => part.Trim())
+                .Where(part => !string.IsNullOrEmpty(part))
+                .Select(part => part.Split('='))
+                .Where(split => split.Length == 2)
+                .ToDictionary(split => split[0], split => split[1]);
+
+            return parts;
+        }
+    }
+}
