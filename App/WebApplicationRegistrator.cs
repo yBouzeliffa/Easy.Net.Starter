@@ -12,19 +12,10 @@ namespace Easy.Net.Starter.App
     {
         public static void RegisterSerilog(this ConfigureHostBuilder host, IConfiguration configuration)
         {
-            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
             host.UseSerilog();
-        }
-
-        public static AppSettings RegisterAppSettings(this IServiceCollection services, IConfiguration configuration)
-        {
-            var configurationSettings = new AppSettings();
-            configuration.Bind(configurationSettings); // Bind appsettings info to data model
-            services.AddSingleton(configurationSettings);
-
-            Log.Logger.Information("Configuration registered");
-
-            return configurationSettings;
         }
 
         public static void RegisterDatabase<T>(this IServiceCollection services, AppSettings appSettings) where T : DbContext

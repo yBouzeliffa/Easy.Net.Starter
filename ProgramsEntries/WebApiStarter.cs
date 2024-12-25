@@ -9,21 +9,20 @@ namespace Easy.Net.Starter.ProgramsEntries
 {
     public static class WebApiStarter
     {
-        public static void Start<T>(string[] args, StartupOptions options) where T : DbContext
+        public static void Start<T, TAppSettings>(string[] args, StartupOptions options) where T : DbContext
+            where TAppSettings : AppSettings, new()
         {
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Host.RegisterSerilog(builder.Configuration);
 
-            string appName = Process.GetCurrentProcess().ProcessName;
+            var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(builder.Configuration);
 
             Log.Logger.Information("");
             Log.Logger.Information("╔═══════════════════════════════════════════════════╗");
             Log.Logger.Information("║              !! Api initialization !!             ║");
             Log.Logger.Information("╚═══════════════════════════════════════════════════╝");
             Log.Logger.Information("");
-
-            var appSettings = builder.Services.RegisterAppSettings(builder.Configuration);
 
             Log.Logger.Information("");
             Log.Logger.Information($"Version : {appSettings.Version}");
@@ -51,7 +50,7 @@ namespace Easy.Net.Starter.ProgramsEntries
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.RegisterApplicationCapabilities(appName);
+            app.RegisterApplicationCapabilities(Process.GetCurrentProcess().ProcessName);
             app.RegisterMiddlewares(options.Middlewares);
             app.RegisterExceptionHandler(appSettings);
             app.UseAppCors();

@@ -7,6 +7,18 @@ namespace Easy.Net.Starter.App
 {
     public static class ApplicationRegistrator
     {
+        public static TAppSettings RegisterAppSettings<TAppSettings>(this IServiceCollection services, IConfiguration configuration)
+            where TAppSettings : AppSettings, new()
+        {
+            var configurationSettings = new TAppSettings();
+            configuration.Bind(configurationSettings);
+            services.AddSingleton(configurationSettings);
+
+            Log.Logger.Information("Configuration registered");
+
+            return configurationSettings;
+        }
+
         public static IConfiguration? RegisterConfiguration()
         {
             try

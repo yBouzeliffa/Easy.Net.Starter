@@ -1,6 +1,5 @@
 ﻿using Easy.Net.Starter.App;
 using Easy.Net.Starter.Loggers;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -10,7 +9,8 @@ namespace Easy.Net.Starter.ProgramsEntries
 {
     public static class ConsoleAppStarter
     {
-        public static ServiceProvider Start(string[] args, StartupOptions options)
+        public static ServiceProvider Start<TAppSettings>(string[] args, StartupOptions options)
+            where TAppSettings : AppSettings, new()
         {
             var builder = Host.CreateApplicationBuilder(args);
 
@@ -18,17 +18,14 @@ namespace Easy.Net.Starter.ProgramsEntries
 
             ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
 
-            var configurationSettings = new AppSettings();
-            configuration.Bind(configurationSettings);
-            builder.Services.AddSingleton(configurationSettings);
+            var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(configuration);
+
             builder.Services.AddSerilog(config =>
             {
                 config
                     .ReadFrom.Configuration(configuration)
-                    .WriteTo.File(configurationSettings.OverrideWriteLogToFile.Replace("{APP_NAME}", Process.GetCurrentProcess().ProcessName));
+                    .WriteTo.File(appSettings.OverrideWriteLogToFile.Replace("{APP_NAME}", Process.GetCurrentProcess().ProcessName));
             });
-
-            Log.Logger.Information("Configuration registered");
 
             builder.Services.AddScoped<IGenericLogger, GenericLogger>();
 
@@ -41,7 +38,6 @@ namespace Easy.Net.Starter.ProgramsEntries
                 options.ScopedWithInterfaces,
                 options.TransientsWithInterfaces);
 
-            var appSettings = serviceProvider.GetRequiredService<AppSettings>();
             var logger = serviceProvider.GetRequiredService<IGenericLogger>();
 
             logger.LogInformation("");
