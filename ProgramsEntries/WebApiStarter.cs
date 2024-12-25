@@ -26,7 +26,7 @@ namespace Easy.Net.Starter.ProgramsEntries
             Log.Logger.Information("");
 
             Log.Logger.Information("");
-            Log.Logger.Information($"Version : {appSettings.Version}");
+            Log.Logger.Information("Version : {Version}", appSettings.Version);
             Log.Logger.Information("");
 
             if (options.UseDatabase)

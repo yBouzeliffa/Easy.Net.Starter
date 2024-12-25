@@ -49,7 +49,7 @@ namespace Easy.Net.Starter.ProgramsEntries
             logger.LogInformation("");
 
             logger.LogInformation("");
-            logger.LogInformation($"Version : {appSettings.Version}");
+            logger.LogInformation("Version : {Version}", appSettings.Version);
             logger.LogInformation("");
 
             return serviceProvider;

@@ -59,6 +59,7 @@ namespace Easy.Net.Starter.App
                     .WithTitle(apiName)
                     .WithTheme(ScalarTheme.Saturn);
             });
+            application.MapHealthChecks("/health");
 
             Log.Logger.Information("Application Capabilities registered");
         }

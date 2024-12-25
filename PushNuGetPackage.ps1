@@ -99,8 +99,43 @@ Write-Host "Exécution de la commande : $command" -ForegroundColor Yellow
 try {
     Invoke-Expression $command
     Write-Host "Le package a été publié avec succès." -ForegroundColor Green
-    pause
 } catch {
     Write-Host "Erreur lors de la publication du package : $_" -ForegroundColor Red
     pause
+}
+
+
+# Ajouter les modifications au commit
+Write-Host "Ajout des modifications au commit Git..." -ForegroundColor Yellow
+try {
+    Invoke-Expression "git add ."
+    Write-Host "Modifications ajoutées avec succès." -ForegroundColor Green
+} catch {
+    Write-Host "Erreur lors de l'ajout des modifications : $_" -ForegroundColor Red
+    pause
+    exit
+}
+
+# Committer les modifications
+$commitMessage = "Mise à jour automatique de la version à $newVersion"
+Write-Host "Commit des modifications avec le message : $commitMessage" -ForegroundColor Yellow
+try {
+    Invoke-Expression "git commit -m `"$commitMessage`""
+    Write-Host "Modifications committées avec succès." -ForegroundColor Green
+} catch {
+    Write-Host "Erreur lors du commit : $_" -ForegroundColor Red
+    pause
+    exit
+}
+
+# Pousser les modifications sur la branche courante
+Write-Host "Poussée des modifications sur la branche courante..." -ForegroundColor Yellow
+try {
+    Invoke-Expression "git push"
+    Write-Host "Modifications poussées avec succès sur la branche courante." -ForegroundColor Green
+    pause
+} catch {
+    Write-Host "Erreur lors de la poussée des modifications : $_" -ForegroundColor Red
+    pause
+    exit
 }
