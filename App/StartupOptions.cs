@@ -2,7 +2,8 @@
 {
     public class StartupOptions
     {
-        public bool WithDatabase { get; set; }
+        public bool UseSignalR { get; set; }
+        public bool UseDatabase { get; set; }
         public string[] Middlewares { get; set; } = Array.Empty<string>();
         public string[] SingletonServices { get; set; } = Array.Empty<string>();
         public string[] ScopedServices { get; set; } = Array.Empty<string>();

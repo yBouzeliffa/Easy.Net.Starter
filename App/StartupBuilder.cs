@@ -9,7 +9,13 @@
         private readonly List<string> _scopedServices = new();
         private readonly List<string> _transientServices = new();
         private bool _useDatabase = false;
+        private bool _useSignalR = false;
 
+        public StartupBuilder AddSignalR()
+        {
+            _useSignalR = true;
+            return this;
+        }
         public StartupBuilder AddDatabase()
         {
             _useDatabase = true;
@@ -56,7 +62,8 @@
         {
             return new StartupOptions
             {
-                WithDatabase = _useDatabase,
+                UseSignalR = _useSignalR,
+                UseDatabase = _useDatabase,
                 SingletonServices = _singletonServices.ToArray(),
                 ScopedServices = _scopedServices.ToArray(),
                 TransientServices = _transientServices.ToArray(),

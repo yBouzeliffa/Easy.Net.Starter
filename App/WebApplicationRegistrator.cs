@@ -41,6 +41,7 @@ namespace Easy.Net.Starter.App
             services.AddLogging();
             services.AddEndpointsApiExplorer();
             services.AddOpenApi();
+            services.AddHealthChecks();
 
             Log.Logger.Information("Api Capabilities registered");
         }
