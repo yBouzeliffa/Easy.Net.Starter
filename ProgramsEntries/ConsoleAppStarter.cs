@@ -20,6 +20,8 @@ namespace Easy.Net.Starter.ProgramsEntries
 
             var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(configuration);
 
+            ArgumentException.ThrowIfNullOrEmpty(appSettings.OverrideWriteLogToFile, nameof(appSettings));
+
             builder.Services.AddSerilog(config =>
             {
                 config
