@@ -9,16 +9,18 @@
         private readonly List<string> _scopedServices = new();
         private readonly List<string> _transientServices = new();
         private bool _useDatabase = false;
+        private Type? _databaseContextType = null;
         private bool _useSignalR = false;
-
         public StartupBuilder AddSignalR()
         {
             _useSignalR = true;
             return this;
         }
-        public StartupBuilder AddDatabase()
+
+        public StartupBuilder AddDatabase<TDatabaseContext>() where TDatabaseContext : class
         {
             _useDatabase = true;
+            _databaseContextType = typeof(TDatabaseContext);
             return this;
         }
 
