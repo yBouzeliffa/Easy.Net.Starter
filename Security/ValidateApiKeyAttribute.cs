@@ -10,20 +10,19 @@ namespace Easy.Net.Starter.Security
     [AttributeUsage(AttributeTargets.All)]
     public sealed class ValidateApiKeyAttribute : ActionFilterAttribute
     {
-        private IRsaService _rsaService;
-        private AppSettings _appSettings;
-
-        public ValidateApiKeyAttribute()
-        {
-        }
+        private IRsaService? _rsaService;
+        private AppSettings? _appSettings;
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            _rsaService = (IRsaService)context.HttpContext.RequestServices.GetService(typeof(IRsaService));
-            _appSettings = (AppSettings)context.HttpContext.RequestServices.GetService(typeof(AppSettings));
+            var rsaObject = context.HttpContext.RequestServices.GetService(typeof(IRsaService));
+            var appSettingsObject = context.HttpContext.RequestServices.GetService(typeof(AppSettings));
 
-            ArgumentNullException.ThrowIfNull(_rsaService, nameof(_rsaService));
-            ArgumentNullException.ThrowIfNull(_appSettings, nameof(_appSettings));
+            ArgumentNullException.ThrowIfNull(rsaObject, nameof(rsaObject));
+            ArgumentNullException.ThrowIfNull(appSettingsObject, nameof(appSettingsObject));
+
+            _rsaService = (IRsaService)rsaObject;
+            _appSettings = (AppSettings)appSettingsObject;
 
             base.OnActionExecuting(context);
 
@@ -40,17 +39,20 @@ namespace Easy.Net.Starter.Security
 
         private bool IsValidApiKey(HttpRequest request)
         {
-            if (!request.Headers.ContainsKey("X-API-KEY"))
+            if (!request.Headers.TryGetValue("X-API-KEY", out Microsoft.Extensions.Primitives.StringValues value))
             {
                 return false;
             }
 
-            string publicApiKey = request.Headers["X-API-KEY"];
+            string publicApiKey = value;
 
             if (string.IsNullOrWhiteSpace(publicApiKey))
             {
                 return false;
             }
+
+            ArgumentNullException.ThrowIfNull(_rsaService, nameof(_rsaService));
+            ArgumentNullException.ThrowIfNull(_appSettings, nameof(_appSettings));
 
             if (!_appSettings.ApiKey.ApiPublicKey.Contains(publicApiKey))
             {

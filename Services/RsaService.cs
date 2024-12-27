@@ -68,7 +68,7 @@ public class RsaService : IRsaService
         {
             var pemWriter = new PemWriter(textWriter);
             pemWriter.WriteObject(key);
-            return textWriter.ToString();
+            return textWriter.ToString() ?? string.Empty;
         }
     }
 

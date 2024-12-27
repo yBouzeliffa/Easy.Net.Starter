@@ -12,7 +12,7 @@ public class HttpLoggerMiddleware(RequestDelegate next)
     {
         var responseBody = string.Empty;
         string userTag = "Unknown";
-        ConnectedUser user = null;
+        ConnectedUser user;
 
         try
         {
@@ -28,16 +28,18 @@ public class HttpLoggerMiddleware(RequestDelegate next)
                 return;
             }
 
-            if (context.User.Identity.IsAuthenticated)
+            if (context.User.Identity is not null && context.User.Identity.IsAuthenticated)
             {
-                var identity = context.User.Identity as ClaimsIdentity;
-                user = new ConnectedUser().FromClaims(identity);
-                userTag = user.DisplayName;
+                if (context.User.Identity is ClaimsIdentity identity)
+                {
+                    user = new ConnectedUser().FromClaims(identity);
+                    userTag = user.DisplayName;
+                }
             }
 
             logger.LogInformation("--- HTTP CALL BY {UserTag} || IS CALLING METHOD || [{RequestMethod}] {RequestPath}", userTag.TrimEnd(), context.Request.Method, context.Request.Path);
             Stream originalBody = context.Response.Body;
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
 
             try

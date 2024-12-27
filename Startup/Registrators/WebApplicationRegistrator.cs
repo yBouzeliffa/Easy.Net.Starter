@@ -152,7 +152,7 @@ namespace Easy.Net.Starter.Startup.Registrators
 
                     if (fullname != null && assembly != null)
                     {
-                        Type type = assembly.GetType(fullname);
+                        var type = assembly.GetType(fullname);
 
                         if (type == null)
                         {

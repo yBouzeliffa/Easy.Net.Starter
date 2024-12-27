@@ -38,6 +38,10 @@ namespace Easy.Net.Starter.Security
 
             var urls = appSettings.AllowedOrigins.Split(',')?.Select(url => new Uri(url).Authority).ToList();
             var host = request.Host.Value;
+
+            ArgumentNullException.ThrowIfNull(urls, nameof(urls));
+            ArgumentException.ThrowIfNullOrEmpty(host, nameof(host));
+
             urls.Add(host);
             bool isValidClient = urls.Contains(new Uri(referrerURL).Authority);
 

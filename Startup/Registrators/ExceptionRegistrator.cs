@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net;
 
 namespace Easy.Net.Starter.Startup.Registrators
@@ -26,7 +27,7 @@ namespace Easy.Net.Starter.Startup.Registrators
             }
             catch (Exception ex)
             {
-
+                Log.Logger.Error(ex, "Error while registering exception handler.");
                 throw;
             }
         }
@@ -40,20 +41,20 @@ namespace Easy.Net.Starter.Startup.Registrators
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     context.Response.ContentType = "application/json";
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    context.Response.Headers.Add("Access-Control-Allow-Origin", urlConfig);
-                    context.Response.Headers.Add("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type");
+                    context.Response.Headers.TryAdd("Access-Control-Allow-Origin", urlConfig);
+                    context.Response.Headers.TryAdd("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type");
 
                     if (contextFeature != null)
                     {
                         if (contextFeature.Error is BusinessException businessException)
                         {
-                            app.Logger.LogError("Dev Business Exception :", contextFeature.Error);
+                            app.Logger.LogError("Dev Business Exception: {Error}", contextFeature.Error);
                             var devTechnicalExceptionResult = new ApiExceptionDto
                             {
                                 ErrorText = businessException.ErrorText,
                                 ErrorTitle = businessException.ErrorTitle,
                                 ErrorCode = businessException.ErrorCode ?? "500",
-                                StackTrace = businessException.StackTrace,
+                                StackTrace = businessException.StackTrace ?? string.Empty,
                                 Message = businessException.Message,
                             };
                             context.Response.StatusCode = int.TryParse(businessException.ErrorCode, out int code) ? code : 500;
@@ -61,12 +62,12 @@ namespace Easy.Net.Starter.Startup.Registrators
                         }
                         else
                         {
-                            app.Logger.LogError("Dev Technical Exception :", contextFeature.Error);
+                            app.Logger.LogError("Dev Technical Exception: {Error}", contextFeature.Error);
                             var devTechnicalExceptionResult = new ApiExceptionDto
                             {
                                 ErrorTitle = $"Dev Technical Exception",
                                 ErrorCode = contextFeature.Error.Message.Contains("401") || contextFeature.Error.Message.Contains("Hôte inconnu") ? "401" : "500",
-                                StackTrace = contextFeature.Error.StackTrace,
+                                StackTrace = contextFeature.Error.StackTrace ?? string.Empty,
                                 Message = contextFeature.Error.Message
                             };
                             context.Response.StatusCode = int.TryParse(devTechnicalExceptionResult.ErrorCode, out int code) ? code : 500;
@@ -90,14 +91,14 @@ namespace Easy.Net.Starter.Startup.Registrators
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     context.Response.ContentType = "application/json";
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    context.Response.Headers.Add("Access-Control-Allow-Origin", urlConfig);
-                    context.Response.Headers.Add("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type");
+                    context.Response.Headers.TryAdd("Access-Control-Allow-Origin", urlConfig);
+                    context.Response.Headers.TryAdd("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type");
 
                     if (contextFeature != null)
                     {
                         if (contextFeature.Error is BusinessException businessException)
                         {
-                            app.Logger.LogError("Release Business Exception :", contextFeature.Error);
+                            app.Logger.LogError("Release Business Exception :{Error}", contextFeature.Error);
                             var devTechnicalExceptionResult = new ApiExceptionDto
                             {
                                 ErrorTitle = businessException.ErrorTitle,
@@ -109,7 +110,7 @@ namespace Easy.Net.Starter.Startup.Registrators
                         }
                         else
                         {
-                            app.Logger.LogError("Release technical Exception :", contextFeature.Error);
+                            app.Logger.LogError("Release technical Exception: {Error}", contextFeature.Error);
                             var devTechnicalExceptionResult = new ApiExceptionDto
                             {
                                 ErrorTitle = $"Oups une erreur est survenue",

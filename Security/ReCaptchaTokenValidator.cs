@@ -15,10 +15,9 @@ namespace Easy.Net.Starter.Security
 
             var postContent = new FormUrlEncodedContent(dictionary);
 
-            HttpResponseMessage recaptchaResponse = null;
+            HttpResponseMessage recaptchaResponse;
             string stringContent = "";
 
-            // Call recaptcha api and validate the token
             using (var http = new HttpClient())
             {
                 recaptchaResponse = await http.PostAsync("https://www.google.com/recaptcha/api/siteverify", postContent);
@@ -36,6 +35,8 @@ namespace Easy.Net.Starter.Security
             }
 
             var googleReCaptchaResponse = JsonConvert.DeserializeObject<ReCaptchaResponse>(stringContent);
+
+            ArgumentNullException.ThrowIfNull(googleReCaptchaResponse, "googleReCaptchaResponse");
 
             if (!googleReCaptchaResponse.Success)
             {
