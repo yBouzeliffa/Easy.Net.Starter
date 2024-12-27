@@ -49,7 +49,6 @@ namespace Easy.Net.Starter.Extensions
             }
         }
 
-
         public static string? GetNamespaceFromClass(this string className)
         {
             try
@@ -76,7 +75,5 @@ namespace Easy.Net.Starter.Extensions
                 return null;
             }
         }
-
-
     }
 }

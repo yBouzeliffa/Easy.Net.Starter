@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.App;
+using Easy.Net.Starter.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
@@ -75,6 +76,10 @@ namespace Easy.Net.Starter.ProgramsEntries
                 });
 
                 app.RegisterApplicationCapabilities(Process.GetCurrentProcess().ProcessName);
+
+                if (options.UseHttpLoggerMiddleware)
+                    app.UseMiddleware<HttpLoggerMiddleware>();
+
                 app.RegisterMiddlewares(options.Middlewares);
                 app.RegisterExceptionHandler(appSettings);
                 app.UseAppCors();

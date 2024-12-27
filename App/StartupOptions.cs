@@ -2,6 +2,7 @@
 {
     public class StartupOptions
     {
+        public bool UseHttpLoggerMiddleware { get; set; }
         public bool UseSignalR { get; set; }
         public bool UseDatabase { get; set; }
         public Type? DatabaseContextType { get; set; }

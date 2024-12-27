@@ -12,10 +12,5 @@ namespace Easy.Net.Starter.Extensions
                 ? attributes.First().Description
                 : value.ToString();
         }
-
-        //public static RequireService ToEnum(this string enumString)
-        //{
-        //    return (RequireService)Enum.Parse(typeof(RequireService), enumString);
-        //}
     }
 }

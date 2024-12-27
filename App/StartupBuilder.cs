@@ -11,6 +11,14 @@
         private bool _useDatabase = false;
         private Type? _databaseContextType = null;
         private bool _useSignalR = false;
+        private bool _useHttpLoggerMiddleware = false;
+
+        public StartupBuilder AddHttpLoggerMiddleware()
+        {
+            _useHttpLoggerMiddleware = true;
+            return this;
+        }
+
         public StartupBuilder AddSignalR()
         {
             _useSignalR = true;
@@ -64,6 +72,7 @@
         {
             return new StartupOptions
             {
+                UseHttpLoggerMiddleware = _useHttpLoggerMiddleware,
                 UseSignalR = _useSignalR,
                 UseDatabase = _useDatabase,
                 DatabaseContextType = _databaseContextType,
