@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -7,16 +8,25 @@ namespace Easy.Net.Starter.App
 {
     public static class ApplicationRegistrator
     {
-        public static TAppSettings RegisterAppSettings<TAppSettings>(this IServiceCollection services, IConfiguration configuration)
+        public static TAppSettings RegisterAppSettings<TAppSettings>(
+            this IServiceCollection services, IConfiguration configuration)
             where TAppSettings : AppSettings, new()
         {
-            var configurationSettings = new TAppSettings();
-            configuration.Bind(configurationSettings);
-            services.AddSingleton(configurationSettings);
+            try
+            {
+                var configurationSettings = new TAppSettings();
+                configuration.Bind(configurationSettings);
+                services.AddSingleton(configurationSettings);
 
-            Log.Logger.Information("Configuration registered");
+                Log.Logger?.Information("Appsettings registered");
 
-            return configurationSettings;
+                return configurationSettings;
+            }
+            catch (Exception ex)
+            {
+                Log.Logger?.Error(ex, "Unable to register the configuration");
+                throw;
+            }
         }
 
         public static IConfiguration? RegisterConfiguration()
@@ -26,22 +36,54 @@ namespace Easy.Net.Starter.App
                 DirectoryInfo currentDirectories = new DirectoryInfo(Directory.GetCurrentDirectory());
                 var appsettings = currentDirectories.GetFiles("appsettings.json", SearchOption.AllDirectories).FirstOrDefault();
 
-                ArgumentException.ThrowIfNullOrEmpty(appsettings?.FullName, nameof(appsettings));
+                ArgumentNullException.ThrowIfNull(appsettings, nameof(appsettings));
+                ArgumentException.ThrowIfNullOrEmpty(appsettings.FullName, nameof(appsettings));
 
                 IConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                    .AddJsonFile(appsettings?.FullName);
+                    .AddJsonFile(appsettings.FullName);
 
                 return configurationBuilder.Build();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Unable to compile the configuration");
-                Console.WriteLine(ex.ToString());
-                return null;
+                Log.Logger?.Error(ex, "Unable to compile the appsettings");
+                throw;
             }
         }
 
-        public static ServiceProvider RegisterServices(IServiceCollection services,
+        //Call by reflection
+        public static void RegisterDatabase<T>(this IServiceCollection services, AppSettings appSettings) where T : DbContext
+        {
+            try
+            {
+                ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
+
+                var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+
+                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Host"], "Host");
+                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Database"], "Database");
+                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Port"], "Port");
+
+                Log.Logger.Information("[Database] Database server: {0}", connectionParts["Host"]);
+                Log.Logger.Information("[Database] Database: {0}", connectionParts["Database"]);
+                Log.Logger.Information("[Database] Port: {0}", connectionParts["Port"]);
+                Log.Logger.Information("");
+
+                services.AddDbContext<T>(options =>
+                {
+                    options.UseNpgsql(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL).UseSnakeCaseNamingConvention();
+                });
+
+                Log.Logger.Information("Database registered");
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Unable to register the database");
+                throw;
+            }
+        }
+
+        public static ServiceProvider RegisterServices(this IServiceCollection services,
             string[] singletonServices,
             string[] scopedServices,
             string[] transientsServices,
@@ -49,27 +91,40 @@ namespace Easy.Net.Starter.App
             IDictionary<string, string> scopedsWithInterfaces,
             IDictionary<string, string> transientsWithInterfaces)
         {
-            RegisterServicesByLifetime(services, singletonServices, ServiceLifetime.Singleton);
-            RegisterServicesByLifetime(services, scopedServices, ServiceLifetime.Scoped);
-            RegisterServicesByLifetime(services, transientsServices, ServiceLifetime.Transient);
+            try
+            {
+                RegisterServicesByLifetime(services, singletonServices, ServiceLifetime.Singleton);
+                RegisterServicesByLifetime(services, scopedServices, ServiceLifetime.Scoped);
+                RegisterServicesByLifetime(services, transientsServices, ServiceLifetime.Transient);
 
-            RegisterServicesWithInterfaces(services, singletonsWithInterfaces, ServiceLifetime.Singleton);
-            RegisterServicesWithInterfaces(services, scopedsWithInterfaces, ServiceLifetime.Scoped);
-            RegisterServicesWithInterfaces(services, transientsWithInterfaces, ServiceLifetime.Transient);
-            return services.BuildServiceProvider();
+                RegisterServicesWithInterfaces(services, singletonsWithInterfaces, ServiceLifetime.Singleton);
+                RegisterServicesWithInterfaces(services, scopedsWithInterfaces, ServiceLifetime.Scoped);
+                RegisterServicesWithInterfaces(services, transientsWithInterfaces, ServiceLifetime.Transient);
+                return services.BuildServiceProvider();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Unable to register the services");
+                throw;
+            }
         }
 
-        private static void RegisterServicesByLifetime(IServiceCollection services, string[] serviceNames, ServiceLifetime lifetime)
+        private static void RegisterServicesByLifetime(
+            IServiceCollection services, string[] serviceNames, ServiceLifetime lifetime)
         {
-            foreach (var service in serviceNames)
+            try
             {
-                var fullname = service.GetNamespaceFromClass();
-                var assembly = service.GetAssemblyFromClass();
-                if (fullname != null && assembly != null)
+                foreach (var service in serviceNames)
                 {
-                    Type type = assembly.GetType(fullname);
+                    var fullname = service.GetNamespaceFromClass();
+                    var assembly = service.GetAssemblyFromClass();
 
-                    if (type == null)
+                    ArgumentException.ThrowIfNullOrEmpty(fullname, nameof(fullname));
+                    ArgumentNullException.ThrowIfNull(assembly, nameof(assembly));
+
+                    var type = assembly.GetType(fullname);
+
+                    if (type is null)
                     {
                         Log.Logger.Information($"Type {fullname} non trouvé.");
                         continue;
@@ -89,9 +144,18 @@ namespace Easy.Net.Starter.App
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                var lifetimeString = lifetime.ToString();
+                var serviceNamesString = string.Join(", ", serviceNames);
+                Log.Logger.Error(ex, "Unable to register the services by lifetime: {lifetimeString} for services {serviceNamesString}", lifetimeString, serviceNamesString);
+                throw;
+            }
+
         }
 
-        private static void RegisterServicesWithInterfaces(IServiceCollection services, IDictionary<string, string> servicesWithInterfaces, ServiceLifetime lifetime)
+        private static void RegisterServicesWithInterfaces(
+            IServiceCollection services, IDictionary<string, string> servicesWithInterfaces, ServiceLifetime lifetime)
         {
             foreach (var service in servicesWithInterfaces)
             {
@@ -115,36 +179,79 @@ namespace Easy.Net.Starter.App
             string implementationFullName,
             ServiceLifetime lifetime)
         {
-            var fullnameInterfaceFullName = interfaceFullName.GetNamespaceFromClass();
-            var assemblyInterfaceFullName = interfaceFullName.GetAssemblyFromClass();
-            Type interfaceType = assemblyInterfaceFullName.GetType(fullnameInterfaceFullName);
-
-            var fullnameImplementationType = implementationFullName.GetNamespaceFromClass();
-            var assemblyImplementationType = implementationFullName.GetAssemblyFromClass();
-            Type implementationType = assemblyImplementationType.GetType(fullnameImplementationType);
-
-            ArgumentException.ThrowIfNullOrEmpty(interfaceFullName);
-            ArgumentNullException.ThrowIfNull(implementationType);
-
-            if (!interfaceType.IsAssignableFrom(implementationType))
+            try
             {
-                throw new ArgumentException($"La classe '{implementationFullName}' ne met pas en œuvre l'interface '{interfaceFullName}'.");
-            }
+                ArgumentException.ThrowIfNullOrEmpty(interfaceFullName);
+                ArgumentException.ThrowIfNullOrEmpty(implementationFullName);
 
-            switch (lifetime)
+                // Get interface and implementation full names (with namespaces)
+                var fullnameInterfaceFullName = interfaceFullName.GetNamespaceFromClass();
+                var fullnameImplementationType = implementationFullName.GetNamespaceFromClass();
+
+                ArgumentException.ThrowIfNullOrEmpty(fullnameInterfaceFullName);
+                ArgumentNullException.ThrowIfNull(fullnameImplementationType);
+
+                // Get the assembly of the interface and the implementation
+                var assemblyInterfaceFullName = interfaceFullName.GetAssemblyFromClass();
+                var assemblyImplementationType = implementationFullName.GetAssemblyFromClass();
+
+                ArgumentNullException.ThrowIfNull(assemblyInterfaceFullName);
+                ArgumentNullException.ThrowIfNull(assemblyImplementationType);
+
+                // Get the types of the interface and the implementation
+                var interfaceType = assemblyInterfaceFullName.GetType(fullnameInterfaceFullName);
+                var implementationType = assemblyImplementationType.GetType(fullnameImplementationType);
+
+                ArgumentNullException.ThrowIfNull(interfaceType);
+                ArgumentNullException.ThrowIfNull(implementationType);
+
+                if (!interfaceType.IsAssignableFrom(implementationType))
+                {
+                    throw new ArgumentException($"The class '{implementationFullName}' does not implement the interface '{interfaceFullName}'.");
+                }
+
+                switch (lifetime)
+                {
+                    case ServiceLifetime.Singleton:
+                        services.AddSingleton(interfaceType, implementationType);
+                        break;
+                    case ServiceLifetime.Scoped:
+                        services.AddScoped(interfaceType, implementationType);
+                        break;
+                    case ServiceLifetime.Transient:
+                        services.AddTransient(interfaceType, implementationType);
+                        break;
+                }
+
+                return services;
+            }
+            catch (Exception ex)
             {
-                case ServiceLifetime.Singleton:
-                    services.AddSingleton(interfaceType, implementationType);
-                    break;
-                case ServiceLifetime.Scoped:
-                    services.AddScoped(interfaceType, implementationType);
-                    break;
-                case ServiceLifetime.Transient:
-                    services.AddTransient(interfaceType, implementationType);
-                    break;
+                Log.Logger.Error(ex, "Unable to register the services by names");
+                throw;
             }
+        }
 
-            return services;
+        private static Dictionary<string, string> ParseConnectionString(string connectionString)
+        {
+            try
+            {
+                ArgumentException.ThrowIfNullOrEmpty(connectionString, nameof(connectionString));
+
+                var parts = connectionString.Split(';')
+                    .Select(part => part.Trim())
+                    .Where(part => !string.IsNullOrEmpty(part))
+                    .Select(part => part.Split('='))
+                    .Where(split => split.Length == 2)
+                    .ToDictionary(split => split[0], split => split[1]);
+
+                return parts;
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Unable to parse the connection string");
+                throw;
+            }
         }
     }
 }

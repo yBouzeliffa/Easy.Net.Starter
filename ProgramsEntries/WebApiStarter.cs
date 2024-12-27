@@ -12,76 +12,86 @@ namespace Easy.Net.Starter.ProgramsEntries
         public static WebApplication Start<TAppSettings>(string[] args, StartupOptions options)
             where TAppSettings : AppSettings, new()
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            builder.Host.RegisterSerilog(builder.Configuration);
-
-            var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(builder.Configuration);
-
-            Log.Logger.Information("");
-            Log.Logger.Information("╔═══════════════════════════════════════════════════╗");
-            Log.Logger.Information("║              !! Api initialization !!             ║");
-            Log.Logger.Information("╚═══════════════════════════════════════════════════╝");
-            Log.Logger.Information("");
-
-            Log.Logger.Information("");
-            Log.Logger.Information("Version : {Version}", appSettings.Version);
-            Log.Logger.Information("");
-
-            if (options.UseDatabase && options.DatabaseContextType != null)
+            try
             {
-                var registerDatabaseMethod = typeof(WebApplicationRegistrator)
-                    .GetMethod("RegisterDatabase")
-                    ?.MakeGenericMethod(options.DatabaseContextType);
+                var builder = WebApplication.CreateBuilder(args);
 
-                if (registerDatabaseMethod != null)
+                builder.Host.RegisterSerilog(builder.Configuration);
+
+                var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(builder.Configuration);
+
+                ArgumentNullException.ThrowIfNull(appSettings, nameof(appSettings));
+                ArgumentException.ThrowIfNullOrEmpty(appSettings.Version, nameof(appSettings.Version));
+
+                Log.Logger.Information("");
+                Log.Logger.Information("╔═══════════════════════════════════════════════════╗");
+                Log.Logger.Information("║              !! Api initialization !!             ║");
+                Log.Logger.Information("╚═══════════════════════════════════════════════════╝");
+                Log.Logger.Information("");
+
+                Log.Logger.Information("");
+                Log.Logger.Information("Version : {Version}", appSettings.Version);
+                Log.Logger.Information("");
+
+                if (options.UseDatabase && options.DatabaseContextType != null)
                 {
-                    registerDatabaseMethod.Invoke(null, [builder.Services, appSettings]);
+                    var registerDatabaseMethod = typeof(ApplicationRegistrator)
+                        .GetMethod("RegisterDatabase")
+                        ?.MakeGenericMethod(options.DatabaseContextType);
+
+                    if (registerDatabaseMethod != null)
+                    {
+                        registerDatabaseMethod.Invoke(null, [builder.Services, appSettings]);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("RegisterDatabase method not found.");
+                    }
                 }
-                else
+                else if (options.UseDatabase)
                 {
-                    throw new InvalidOperationException("RegisterDatabase method not found.");
+                    throw new InvalidOperationException("DatabaseContextType must be specified when UseDatabase is true.");
                 }
+
+                if (options.UseSignalR)
+                    builder.Services.AddSignalR();
+
+                builder.Services.RegisterApiCapabilities();
+                builder.Services.RegisterCors(appSettings);
+
+                builder.Services.RegisterServices(
+                    options.SingletonServices,
+                    options.ScopedServices,
+                    options.TransientServices,
+                    options.SingletonsWithInterfaces,
+                    options.ScopedWithInterfaces,
+                    options.TransientsWithInterfaces);
+
+                var app = builder.Build();
+
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
+
+                app.RegisterApplicationCapabilities(Process.GetCurrentProcess().ProcessName);
+                app.RegisterMiddlewares(options.Middlewares);
+                app.RegisterExceptionHandler(appSettings);
+                app.UseAppCors();
+
+                Log.Logger.Information("");
+                Log.Logger.Information("╔═══════════════════════════════════════════════════╗");
+                Log.Logger.Information("║              Application starting ...             ║");
+                Log.Logger.Information("╚═══════════════════════════════════════════════════╝");
+                Log.Logger.Information("");
+
+                return app;
             }
-            else if (options.UseDatabase)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("DatabaseContextType must be specified when UseDatabase is true.");
+                Log.Logger?.Error(ex, "Unable to start the application");
+                throw;
             }
-
-            if (options.UseSignalR)
-                builder.Services.AddSignalR();
-
-            builder.Services.RegisterApiCapabilities(appSettings);
-            builder.Services.RegisterCors(appSettings);
-
-            ApplicationRegistrator.RegisterServices(
-                builder.Services,
-                options.SingletonServices,
-                options.ScopedServices,
-                options.TransientServices,
-                options.SingletonsWithInterfaces,
-                options.ScopedWithInterfaces,
-                options.TransientsWithInterfaces);
-
-            var app = builder.Build();
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
-
-            app.RegisterApplicationCapabilities(Process.GetCurrentProcess().ProcessName);
-            app.RegisterMiddlewares(options.Middlewares);
-            app.RegisterExceptionHandler(appSettings);
-            app.UseAppCors();
-
-            Log.Logger.Information("");
-            Log.Logger.Information("╔═══════════════════════════════════════════════════╗");
-            Log.Logger.Information("║              Application starting ...             ║");
-            Log.Logger.Information("╚═══════════════════════════════════════════════════╝");
-            Log.Logger.Information("");
-
-            return app;
         }
     }
 }

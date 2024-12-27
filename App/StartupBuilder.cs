@@ -66,6 +66,7 @@
             {
                 UseSignalR = _useSignalR,
                 UseDatabase = _useDatabase,
+                DatabaseContextType = _databaseContextType,
                 SingletonServices = _singletonServices.ToArray(),
                 ScopedServices = _scopedServices.ToArray(),
                 TransientServices = _transientServices.ToArray(),

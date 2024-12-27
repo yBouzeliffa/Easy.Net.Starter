@@ -12,13 +12,21 @@ namespace Easy.Net.Starter.App
     {
         public static void RegisterExceptionHandler(this WebApplication app, AppSettings appSettings)
         {
-            if (app.Environment.IsDevelopment())
+            try
             {
-                app.UseApiDevelopmentExceptionHandler(appSettings.AllowedOrigins);
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseApiDevelopmentExceptionHandler(appSettings.AllowedOrigins);
+                }
+                else
+                {
+                    app.UseApiReleaseExceptionHandler(appSettings.AllowedOrigins);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                app.UseApiReleaseExceptionHandler(appSettings.AllowedOrigins);
+
+                throw;
             }
         }
 

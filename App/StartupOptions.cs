@@ -13,5 +13,4 @@
         public IDictionary<string, string> ScopedWithInterfaces { get; set; } = new Dictionary<string, string>();
         public IDictionary<string, string> TransientsWithInterfaces { get; set; } = new Dictionary<string, string>();
     }
-
 }
