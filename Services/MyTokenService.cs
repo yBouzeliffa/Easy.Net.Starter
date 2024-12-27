@@ -1,4 +1,4 @@
-﻿using Easy.Net.Starter.App;
+﻿using Easy.Net.Starter.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

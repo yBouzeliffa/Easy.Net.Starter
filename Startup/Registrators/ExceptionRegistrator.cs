@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.Exceptions;
+using Easy.Net.Starter.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
-namespace Easy.Net.Starter.App
+namespace Easy.Net.Starter.Startup.Registrators
 {
     public static class ExceptionRegistrator
     {

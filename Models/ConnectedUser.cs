@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Easy.Net.Starter.App
+namespace Easy.Net.Starter.Models
 {
     public class ConnectedUser
     {

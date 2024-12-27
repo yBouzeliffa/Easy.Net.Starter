@@ -1,7 +1,8 @@
-﻿namespace Easy.Net.Starter.App
+﻿namespace Easy.Net.Starter.Startup
 {
     public class StartupOptions
     {
+        public bool UseJwtAuthentication { get; set; }
         public bool UseHttpLoggerMiddleware { get; set; }
         public bool UseSignalR { get; set; }
         public bool UseDatabase { get; set; }

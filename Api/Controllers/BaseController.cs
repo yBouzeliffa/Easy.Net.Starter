@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Easy.Net.Starter.Controllers
+namespace Easy.Net.Starter.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

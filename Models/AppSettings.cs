@@ -1,4 +1,4 @@
-﻿namespace Easy.Net.Starter.App
+﻿namespace Easy.Net.Starter.Models
 {
     public partial class AppSettings
     {
@@ -73,7 +73,6 @@
     public class ConnectionStringsSection
     {
         public string APPLICATION_POSTGRE_SQL { get; set; } = string.Empty;
-        public string INSTANCE_MANAGER_POSTGRE_SQL { get; set; } = string.Empty;
     }
 
     public record JwtSection(string Issuer, string Audience, string Key, int MinutesDuration);

@@ -1,16 +1,35 @@
-﻿using Easy.Net.Starter.Extensions;
-using Easy.Net.Starter.Swagger;
+﻿using Easy.Net.Starter.Api.Swagger;
+using Easy.Net.Starter.Extensions;
+using Easy.Net.Starter.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Diagnostics;
 
-namespace Easy.Net.Starter.App
+namespace Easy.Net.Starter.Startup.Registrators
 {
     public static class WebApplicationRegistrator
     {
         private readonly static string CORS_API = "CORS_API";
+
+        public static void CheckAspNetCoreEnvironment(this WebApplicationBuilder builder)
+        {
+            try
+            {
+                Log.Logger.Information("Environment: {EnvironmentName}", builder.Environment.EnvironmentName);
+                if (builder.Environment.IsProduction() && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")))
+                {
+                    Log.Logger.Warning("Warning: ASPNETCORE_ENVIRONMENT is not defined on PATH ENVIRONMENT. Using default 'Production'.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Unable to check the aspnet core environment");
+                throw;
+            }
+        }
 
         public static void RegisterSerilog(this ConfigureHostBuilder host, IConfiguration configuration)
         {
@@ -147,7 +166,7 @@ namespace Easy.Net.Starter.App
                     }
                 }
 
-                Log.Logger.Information("All middlewares have been registered..");
+                Log.Logger.Information("Middlewares registered..");
             }
             catch (Exception ex)
             {

@@ -1,11 +1,12 @@
-﻿using Easy.Net.Starter.App;
-using Easy.Net.Starter.Loggers;
+﻿using Easy.Net.Starter.Loggers;
+using Easy.Net.Starter.Models;
+using Easy.Net.Starter.Startup.Registrators;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Diagnostics;
 
-namespace Easy.Net.Starter.ProgramsEntries
+namespace Easy.Net.Starter.Startup.Entries
 {
     public static class ConsoleAppStarter
     {

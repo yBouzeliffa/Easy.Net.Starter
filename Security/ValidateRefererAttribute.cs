@@ -1,4 +1,4 @@
-﻿using Easy.Net.Starter.App;
+﻿using Easy.Net.Starter.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

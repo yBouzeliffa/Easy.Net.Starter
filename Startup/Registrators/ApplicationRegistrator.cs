@@ -1,10 +1,11 @@
 ﻿using Easy.Net.Starter.Extensions;
+using Easy.Net.Starter.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace Easy.Net.Starter.App
+namespace Easy.Net.Starter.Startup.Registrators
 {
     public static class ApplicationRegistrator
     {
@@ -132,7 +133,7 @@ namespace Easy.Net.Starter.App
 
                     if (type is null)
                     {
-                        Log.Logger.Information($"Type {fullname} non trouvé.");
+                        Log.Logger.Information($"Type {fullname} not found.");
                         continue;
                     }
 
@@ -187,22 +188,22 @@ namespace Easy.Net.Starter.App
         {
             try
             {
-                ArgumentException.ThrowIfNullOrEmpty(interfaceFullName);
-                ArgumentException.ThrowIfNullOrEmpty(implementationFullName);
+                ArgumentException.ThrowIfNullOrEmpty(interfaceFullName, nameof(interfaceFullName));
+                ArgumentException.ThrowIfNullOrEmpty(implementationFullName, nameof(implementationFullName));
 
                 // Get interface and implementation full names (with namespaces)
                 var fullnameInterfaceFullName = interfaceFullName.GetNamespaceFromClass();
                 var fullnameImplementationType = implementationFullName.GetNamespaceFromClass();
 
-                ArgumentException.ThrowIfNullOrEmpty(fullnameInterfaceFullName);
-                ArgumentNullException.ThrowIfNull(fullnameImplementationType);
+                ArgumentException.ThrowIfNullOrEmpty(fullnameInterfaceFullName, "fullnameInterfaceFullName");
+                ArgumentNullException.ThrowIfNull(fullnameImplementationType, "fullnameImplementationType");
 
                 // Get the assembly of the interface and the implementation
                 var assemblyInterfaceFullName = interfaceFullName.GetAssemblyFromClass();
                 var assemblyImplementationType = implementationFullName.GetAssemblyFromClass();
 
-                ArgumentNullException.ThrowIfNull(assemblyInterfaceFullName);
-                ArgumentNullException.ThrowIfNull(assemblyImplementationType);
+                ArgumentNullException.ThrowIfNull(assemblyInterfaceFullName, "assemblyInterfaceFullName");
+                ArgumentNullException.ThrowIfNull(assemblyImplementationType, "assemblyImplementationType");
 
                 // Get the types of the interface and the implementation
                 var interfaceType = assemblyInterfaceFullName.GetType(fullnameInterfaceFullName);

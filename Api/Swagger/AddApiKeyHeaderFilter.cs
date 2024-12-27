@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Easy.Net.Starter.Swagger
+namespace Easy.Net.Starter.Api.Swagger
 {
     public class AddApiKeyHeaderFilter : IOperationFilter
     {

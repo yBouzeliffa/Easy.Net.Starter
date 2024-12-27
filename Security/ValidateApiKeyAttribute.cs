@@ -1,4 +1,4 @@
-﻿using Easy.Net.Starter.App;
+﻿using Easy.Net.Starter.Models;
 using Easy.Net.Starter.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

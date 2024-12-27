@@ -1,4 +1,4 @@
-﻿using Easy.Net.Starter.App;
+﻿using Easy.Net.Starter.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;

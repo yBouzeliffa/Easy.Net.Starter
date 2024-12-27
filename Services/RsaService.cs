@@ -1,4 +1,4 @@
-﻿using Easy.Net.Starter.App;
+﻿using Easy.Net.Starter.Models;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;

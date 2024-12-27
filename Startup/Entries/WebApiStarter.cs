@@ -1,12 +1,16 @@
-﻿using Easy.Net.Starter.App;
+﻿using Easy.Net.Starter.Api.Authentications;
+using Easy.Net.Starter.Models;
 using Easy.Net.Starter.Services;
+using Easy.Net.Starter.Startup.Helpers;
+using Easy.Net.Starter.Startup.Registrators;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Diagnostics;
 
-namespace Easy.Net.Starter.ProgramsEntries
+namespace Easy.Net.Starter.Startup.Entries
 {
     public static class WebApiStarter
     {
@@ -18,6 +22,8 @@ namespace Easy.Net.Starter.ProgramsEntries
                 var builder = WebApplication.CreateBuilder(args);
 
                 builder.Host.RegisterSerilog(builder.Configuration);
+
+                builder.CheckAspNetCoreEnvironment();
 
                 var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(builder.Configuration);
 
@@ -36,6 +42,13 @@ namespace Easy.Net.Starter.ProgramsEntries
 
                 if (options.UseDatabase && options.DatabaseContextType != null)
                 {
+                    ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
+
+                    if (!appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.TryDatabaseConnection())
+                    {
+                        throw new InvalidOperationException("Database connection failed.");
+                    }
+
                     var registerDatabaseMethod = typeof(ApplicationRegistrator)
                         .GetMethod("RegisterDatabase")
                         ?.MakeGenericMethod(options.DatabaseContextType);
@@ -54,6 +67,15 @@ namespace Easy.Net.Starter.ProgramsEntries
                     throw new InvalidOperationException("DatabaseContextType must be specified when UseDatabase is true.");
                 }
 
+                builder.Services.AddScoped<IRsaService, RsaService>();
+
+                if (options.UseDatabase && options.UseJwtAuthentication)
+                {
+                    builder.Services.AddScoped<ITokenService, MyTokenService>();
+                    builder.Services.AddScoped<IUserService, UserService>();
+                    builder.Services.AddTransient<IClaimsTransformation, UserClaimsTransformation>();
+                }
+
                 if (options.UseSignalR)
                     builder.Services.AddSignalR();
 
@@ -68,7 +90,8 @@ namespace Easy.Net.Starter.ProgramsEntries
                     options.ScopedWithInterfaces,
                     options.TransientsWithInterfaces);
 
-                builder.Services.AddScoped<IRsaService, RsaService>();
+                if (options.UseJwtAuthentication)
+                    builder.Services.ConfigureAuthentication(appSettings);
 
                 var app = builder.Build();
 

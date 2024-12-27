@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 
-namespace Easy.Net.Starter.Middlewares;
+namespace Easy.Net.Starter.Api.Middlewares;
 
 public class TokenBasedAuthMiddleware
 {

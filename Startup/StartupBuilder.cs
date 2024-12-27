@@ -1,4 +1,6 @@
-﻿namespace Easy.Net.Starter.App
+﻿using Easy.Net.Starter.EntityFramework;
+
+namespace Easy.Net.Starter.Startup
 {
     public class StartupBuilder
     {
@@ -12,6 +14,13 @@
         private Type? _databaseContextType = null;
         private bool _useSignalR = false;
         private bool _useHttpLoggerMiddleware = false;
+        private bool _useJwtAuthentication = false;
+
+        public StartupBuilder AddJwtAuthentication()
+        {
+            _useJwtAuthentication = true;
+            return this;
+        }
 
         public StartupBuilder AddHttpLoggerMiddleware()
         {
@@ -25,7 +34,7 @@
             return this;
         }
 
-        public StartupBuilder AddDatabase<TDatabaseContext>() where TDatabaseContext : class
+        public StartupBuilder AddDatabase<TDatabaseContext>() where TDatabaseContext : BaseDbContext
         {
             _useDatabase = true;
             _databaseContextType = typeof(TDatabaseContext);
@@ -72,6 +81,7 @@
         {
             return new StartupOptions
             {
+                UseJwtAuthentication = _useJwtAuthentication,
                 UseHttpLoggerMiddleware = _useHttpLoggerMiddleware,
                 UseSignalR = _useSignalR,
                 UseDatabase = _useDatabase,
