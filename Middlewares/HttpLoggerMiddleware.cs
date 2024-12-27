@@ -4,22 +4,27 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Security.Claims;
 
-namespace Easy.Net.Starter.Middlewares;
-
 public class HttpLoggerMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next = next;
+    private readonly RequestDelegate _next = next;
 
     public async Task InvokeAsync(HttpContext context, ILogger<HttpLoggerMiddleware> logger)
     {
         var responseBody = string.Empty;
         string userTag = "Unknown";
         ConnectedUser user = null;
+
         try
         {
             if (context.Request.Method == "OPTIONS")
             {
-                await next(context);
+                await _next(context);
+                return;
+            }
+
+            if (!context.Request.Path.StartsWithSegments("/api"))
+            {
+                await _next(context);
                 return;
             }
 
@@ -41,7 +46,7 @@ public class HttpLoggerMiddleware(RequestDelegate next)
                 {
                     context.Response.Body = memStream;
 
-                    await next(context);
+                    await _next(context);
 
                     memStream.Position = 0;
                     responseBody = new StreamReader(memStream).ReadToEnd();
@@ -82,7 +87,7 @@ public class HttpLoggerMiddleware(RequestDelegate next)
         {
             var sentryTraceId = Guid.NewGuid().ToString("N");
             logger.LogError("[Sentry_{SentryTraceId}] Unhandled exception detected on global HTTP middleware: {ErrorMessage}\n{StackTrace}\n\n[{ResponseBody}]", sentryTraceId, exception.Message, exception.StackTrace, responseBody);
-            await next(context);
+            await _next(context);
         }
     }
 }

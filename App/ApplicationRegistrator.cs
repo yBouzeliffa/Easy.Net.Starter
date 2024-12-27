@@ -18,6 +18,12 @@ namespace Easy.Net.Starter.App
                 configuration.Bind(configurationSettings);
                 services.AddSingleton(configurationSettings);
 
+                // Also Register the appsettings for core api workload
+                var appSettings = configurationSettings as AppSettings;
+                configuration.Bind(appSettings);
+                services.AddSingleton(appSettings);
+
+
                 Log.Logger?.Information("Appsettings registered");
 
                 return configurationSettings;

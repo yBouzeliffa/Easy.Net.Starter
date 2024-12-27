@@ -1,5 +1,5 @@
 ﻿using Easy.Net.Starter.App;
-using Easy.Net.Starter.Middlewares;
+using Easy.Net.Starter.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +57,7 @@ namespace Easy.Net.Starter.ProgramsEntries
                 if (options.UseSignalR)
                     builder.Services.AddSignalR();
 
-                builder.Services.RegisterApiCapabilities();
+                builder.Services.RegisterApiCapabilities(appSettings);
                 builder.Services.RegisterCors(appSettings);
 
                 builder.Services.RegisterServices(
@@ -67,6 +67,8 @@ namespace Easy.Net.Starter.ProgramsEntries
                     options.SingletonsWithInterfaces,
                     options.ScopedWithInterfaces,
                     options.TransientsWithInterfaces);
+
+                builder.Services.AddScoped<IRsaService, RsaService>();
 
                 var app = builder.Build();
 

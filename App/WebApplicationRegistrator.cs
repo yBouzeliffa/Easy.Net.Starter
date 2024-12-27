@@ -1,8 +1,8 @@
 ﻿using Easy.Net.Starter.Extensions;
+using Easy.Net.Starter.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Scalar.AspNetCore;
 using Serilog;
 using System.Diagnostics;
 
@@ -34,14 +34,18 @@ namespace Easy.Net.Starter.App
             }
         }
 
-        public static void RegisterApiCapabilities(this IServiceCollection services)
+        public static void RegisterApiCapabilities(this IServiceCollection services, AppSettings appSettings)
         {
             try
             {
-                services.AddOpenApi();
                 services.AddControllers();
                 services.AddLogging();
                 services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen(options =>
+                {
+                    options.OperationFilter<AddApiKeyHeaderFilter>("X-API-KEY", appSettings.ApiKey.ApiPublicKey);
+                    options.OperationFilter<AddReferrerHeaderFilter>("Referer", appSettings.AllowedOrigins.Split(',').ToArray().First());
+                });
 
                 services.AddHealthChecks();
 
@@ -64,14 +68,9 @@ namespace Easy.Net.Starter.App
                 application.UseAuthentication();
                 application.UseAuthorization();
                 application.MapControllers();
-                application.MapOpenApi();
-                application.MapScalarApiReference(options =>
-                {
-                    options
-                        .WithTitle(apiName)
-                        .WithTheme(ScalarTheme.Saturn);
-                });
-                application.MapHealthChecks("/health");
+                application.UseSwagger();
+                application.UseSwaggerUI();
+                application.MapHealthChecks("api/health");
 
                 Log.Logger.Information("Application Capabilities registered");
             }
