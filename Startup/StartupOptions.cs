@@ -6,6 +6,7 @@
         public bool UseHttpLoggerMiddleware { get; set; }
         public bool UseSignalR { get; set; }
         public bool UseDatabase { get; set; }
+        public bool UseDatabaseWithBuiltInUserConfiguration { get; set; }
         public Type? DatabaseContextType { get; set; }
         public string[] Middlewares { get; set; } = Array.Empty<string>();
         public string[] SingletonServices { get; set; } = Array.Empty<string>();

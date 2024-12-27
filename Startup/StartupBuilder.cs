@@ -11,6 +11,7 @@ namespace Easy.Net.Starter.Startup
         private readonly List<string> _scopedServices = new();
         private readonly List<string> _transientServices = new();
         private bool _useDatabase = false;
+        private bool _useDatabaseWithBuiltInUserConfiguration = false;
         private Type? _databaseContextType = null;
         private bool _useSignalR = false;
         private bool _useHttpLoggerMiddleware = false;
@@ -34,9 +35,17 @@ namespace Easy.Net.Starter.Startup
             return this;
         }
 
-        public StartupBuilder AddDatabase<TDatabaseContext>() where TDatabaseContext : BaseDbContext
+        public StartupBuilder AddDatabase<TDatabaseContext>() where TDatabaseContext : class
         {
             _useDatabase = true;
+            _databaseContextType = typeof(TDatabaseContext);
+            return this;
+        }
+
+        public StartupBuilder AddDatabaseWithBuiltInUserConfiguration<TDatabaseContext>() where TDatabaseContext : BaseDbContext
+        {
+            _useDatabase = true;
+            _useDatabaseWithBuiltInUserConfiguration = true;
             _databaseContextType = typeof(TDatabaseContext);
             return this;
         }
@@ -85,10 +94,11 @@ namespace Easy.Net.Starter.Startup
                 UseHttpLoggerMiddleware = _useHttpLoggerMiddleware,
                 UseSignalR = _useSignalR,
                 UseDatabase = _useDatabase,
+                UseDatabaseWithBuiltInUserConfiguration = _useDatabaseWithBuiltInUserConfiguration,
                 DatabaseContextType = _databaseContextType,
-                SingletonServices = _singletonServices.ToArray(),
-                ScopedServices = _scopedServices.ToArray(),
-                TransientServices = _transientServices.ToArray(),
+                SingletonServices = [.. _singletonServices],
+                ScopedServices = [.. _scopedServices],
+                TransientServices = [.. _transientServices],
                 ScopedWithInterfaces = new Dictionary<string, string>(_scopedWithInterfaces),
                 SingletonsWithInterfaces = new Dictionary<string, string>(_singletonWithInterfaces),
                 TransientsWithInterfaces = new Dictionary<string, string>(_transcientWithInterfaces)

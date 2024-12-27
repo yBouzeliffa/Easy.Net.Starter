@@ -69,7 +69,7 @@ namespace Easy.Net.Starter.Startup.Entries
 
                 builder.Services.AddScoped<IRsaService, RsaService>();
 
-                if (options.UseDatabase && options.UseJwtAuthentication)
+                if (options.UseDatabaseWithBuiltInUserConfiguration && options.UseJwtAuthentication)
                 {
                     builder.Services.AddScoped<ITokenService, MyTokenService>();
                     builder.Services.AddScoped<IUserService, UserService>();
