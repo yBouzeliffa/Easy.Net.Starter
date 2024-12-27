@@ -1,40 +1,40 @@
 ﻿# Easy.Net.Starter
 
-**Easy.Net.Starter** est une bibliothèque .NET conçue pour accélérer le démarrage de projets **Console** ou **API**. Elle propose une configuration prête à l'emploi avec :
+**Easy.Net.Starter** is a .NET library designed to accelerate the setup of **Console** or **API** projects. It provides a ready-to-use configuration with:
 
-- **Logs** intégrés via **Serilog**.
-- Gestion centralisée des **settings** (`appsettings.json`) pour différents environnements.
-- Mise en place automatique du **Dependency Injection (DI)**.
-- Support de la **base de données** (PostgreSQL avec conventions SnakeCase).
-- Configuration rapide des **CORS**, middlewares, et capacités API (Swagger, santé, etc.).
+- **Integrated logging** using **Serilog**.
+- Centralized management of **settings** (`appsettings.json`) for different environments.
+- Automatic setup of **Dependency Injection (DI)**.
+- **Database support** (PostgreSQL with SnakeCase conventions).
+- Quick configuration for **CORS**, middlewares, and API capabilities (Swagger, health checks, etc.).
 
 ---
 
-## Fonctionnalités principales
+## Key Features
 
-1. **Initialisation des logs avec Serilog** :
-   Enregistre automatiquement les logs dans la console ou des fichiers.
+1. **Logging with Serilog**:  
+   Automatically logs to the console or files.
 
-2. **Compilation et enregistrement des settings** :
-   Charge les paramètres depuis `appsettings.json` et les expose via le DI.
+2. **Settings management**:  
+   Loads settings from `appsettings.json` and exposes them via DI.
 
-3. **Support PostgreSQL** :
-   Ajout facile d'un contexte Entity Framework avec une configuration par défaut.
+3. **PostgreSQL support**:  
+   Easily add an Entity Framework context with default configuration.
 
-4. **API Ready** :
-   Active les capacités d'API (Swagger, contrôleurs, endpoints de santé) en une ligne.
+4. **API Ready**:  
+   Enable API capabilities (Swagger, controllers, health endpoints) with a single line.
 
-5. **CORS** :
-   Configuration simplifiée pour les origines, méthodes, et headers autorisés.
+5. **CORS**:  
+   Simplified configuration for allowed origins, methods, and headers.
 
-6. **Gestion des middlewares** :
-   Ajout dynamique de middlewares personnalisés via réflexion.
+6. **Middleware management**:  
+   Dynamically add custom middlewares using reflection.
 
 ---
 
 ## Installation
 
-Ajoutez **Easy.Net.Starter** à votre projet via NuGet :
+Add **Easy.Net.Starter** to your project via NuGet:
 
 ```bash
 dotnet add package Easy.Net.Starter
@@ -42,9 +42,9 @@ dotnet add package Easy.Net.Starter
 
 ---
 
-## Exemple d'utilisation
+## Usage Examples
 
-### Initialisation dans une API
+### Initializing an API
 
 ```csharp
 using Easy.Net.Starter.Api;
@@ -59,10 +59,9 @@ var startupOptions = new StartupBuilder()
 var app = WebApiStarter.Start<CustomAppSettings>(args, startupOptions);
 
 app.Run();
-
 ```
 
-### Initialisation avec une base de données
+### Initializing with a Database
 
 ```csharp
 using Easy.Net.Starter.Api;
@@ -78,19 +77,18 @@ var startupOptions = new StartupBuilder()
 var app = WebApiStarter.Start<CustomAppSettings>(args, startupOptions);
 
 app.Run();
-
 ```
 
 ---
 
 ## Contribution
 
-Les contributions sont bienvenues ! Si vous souhaitez proposer une amélioration ou signaler un bug, ouvrez une issue ou soumettez une Pull Request.
+Contributions are welcome! If you’d like to suggest an improvement or report a bug, please open an issue or submit a Pull Request.
 
 ---
 
-## Licence
+## License
 
-Ce projet est sous licence [MIT](LICENSE).
+This project is licensed under the [MIT](LICENSE).
 
 ---
