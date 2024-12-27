@@ -78,8 +78,16 @@ try {
 # Se déplacer dans le répertoire de sortie
 Set-Location -Path "./bin/Release/"
 
-# Trouver le dernier fichier .nupkg (trié par ordre alphabétique inverse)
-$latestPackage = Get-ChildItem -Path . -Filter "*.nupkg" | Sort-Object Name -Descending | Select-Object -First 1
+# Trouver le dernier fichier .nupkg (trié par version numérique)
+$latestPackage = Get-ChildItem -Path . -Filter "*.nupkg" | Sort-Object {
+    # Extraire la version du nom du fichier
+    if ($_ -match "\d+\.\d+\.\d+") {
+        [version]$matches[0]
+    } else {
+        [version]"0.0.0"  # Si aucune version n'est trouvée, on attribue une version minimale
+    }
+} -Descending | Select-Object -First 1
+
 
 if (-not $latestPackage) {
     Write-Host "Erreur : Aucun fichier .nupkg trouvé dans le répertoire." -ForegroundColor Red
@@ -99,43 +107,44 @@ Write-Host "Exécution de la commande : $command" -ForegroundColor Yellow
 try {
     Invoke-Expression $command
     Write-Host "Le package a été publié avec succès." -ForegroundColor Green
+    pause
 } catch {
     Write-Host "Erreur lors de la publication du package : $_" -ForegroundColor Red
     pause
 }
 
 
-# Ajouter les modifications au commit
-Write-Host "Ajout des modifications au commit Git..." -ForegroundColor Yellow
-try {
-    Invoke-Expression "git add ."
-    Write-Host "Modifications ajoutées avec succès." -ForegroundColor Green
-} catch {
-    Write-Host "Erreur lors de l'ajout des modifications : $_" -ForegroundColor Red
-    pause
-    exit
-}
+# # Ajouter les modifications au commit
+# Write-Host "Ajout des modifications au commit Git..." -ForegroundColor Yellow
+# try {
+    # Invoke-Expression "git add ."
+    # Write-Host "Modifications ajoutées avec succès." -ForegroundColor Green
+# } catch {
+    # Write-Host "Erreur lors de l'ajout des modifications : $_" -ForegroundColor Red
+    # pause
+    # exit
+# }
 
-# Committer les modifications
-$commitMessage = "Mise à jour automatique de la version à $newVersion"
-Write-Host "Commit des modifications avec le message : $commitMessage" -ForegroundColor Yellow
-try {
-    Invoke-Expression "git commit -m `"$commitMessage`""
-    Write-Host "Modifications committées avec succès." -ForegroundColor Green
-} catch {
-    Write-Host "Erreur lors du commit : $_" -ForegroundColor Red
-    pause
-    exit
-}
+# # Committer les modifications
+# $commitMessage = "Mise à jour automatique de la version à $newVersion"
+# Write-Host "Commit des modifications avec le message : $commitMessage" -ForegroundColor Yellow
+# try {
+    # Invoke-Expression "git commit -m `"$commitMessage`""
+    # Write-Host "Modifications committées avec succès." -ForegroundColor Green
+# } catch {
+    # Write-Host "Erreur lors du commit : $_" -ForegroundColor Red
+    # pause
+    # exit
+# }
 
-# Pousser les modifications sur la branche courante
-Write-Host "Poussée des modifications sur la branche courante..." -ForegroundColor Yellow
-try {
-    Invoke-Expression "git push"
-    Write-Host "Modifications poussées avec succès sur la branche courante." -ForegroundColor Green
-    pause
-} catch {
-    Write-Host "Erreur lors de la poussée des modifications : $_" -ForegroundColor Red
-    pause
-    exit
-}
+# # Pousser les modifications sur la branche courante
+# Write-Host "Poussée des modifications sur la branche courante..." -ForegroundColor Yellow
+# try {
+    # Invoke-Expression "git push"
+    # Write-Host "Modifications poussées avec succès sur la branche courante." -ForegroundColor Green
+    # pause
+# } catch {
+    # Write-Host "Erreur lors de la poussée des modifications : $_" -ForegroundColor Red
+    # pause
+    # exit
+# }
