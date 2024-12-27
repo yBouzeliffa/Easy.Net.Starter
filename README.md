@@ -1,8 +1,4 @@
-﻿Voici une version simplifiée et concise de ton README pour **Easy.Net.Starter** :
-
----
-
-# Easy.Net.Starter
+﻿# Easy.Net.Starter
 
 **Easy.Net.Starter** est un package NuGet conçu pour démarrer rapidement une application Console ou une API en C#. Il simplifie la configuration initiale en intégrant automatiquement :
 
@@ -19,5 +15,3 @@ dotnet add package Easy.Net.Starter
 ```
 
 ---
-
-Pour toute question ou contribution, n'hésitez pas à me contacter.
