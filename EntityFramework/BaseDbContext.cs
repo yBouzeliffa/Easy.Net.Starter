@@ -4,6 +4,17 @@ namespace Easy.Net.Starter.EntityFramework
 {
     public class BaseDbContext : DbContext
     {
+        public BaseDbContext(DbContextOptions options)
+            : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            ConfigureUser(modelBuilder);
+        }
+
         public virtual DbSet<User> Users { get; set; }
 
         protected virtual void ConfigureUser(ModelBuilder modelBuilder)

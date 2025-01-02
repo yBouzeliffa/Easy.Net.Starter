@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.Api.Authentications;
+using Easy.Net.Starter.EntityFramework;
 using Easy.Net.Starter.Models;
 using Easy.Net.Starter.Services;
 using Easy.Net.Starter.Startup.Helpers;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Easy.Net.Starter.Startup.Entries
 {
@@ -49,18 +51,19 @@ namespace Easy.Net.Starter.Startup.Entries
                         throw new InvalidOperationException("Database connection failed.");
                     }
 
-                    var registerDatabaseMethod = typeof(ApplicationRegistrator)
-                        .GetMethod("RegisterDatabase")
-                        ?.MakeGenericMethod(options.DatabaseContextType);
+                    var method = typeof(ApplicationRegistrator).GetMethod(
+                       options.UseDatabaseWithBuiltInUserConfiguration ? "RegisterDatabaseWithBaseDbContext" : "RegisterDatabase",
+                        BindingFlags.Static | BindingFlags.Public,
+                        null,
+                        new[] { typeof(IServiceCollection), typeof(AppSettings) },
+                        null
+                    );
 
-                    if (registerDatabaseMethod != null)
-                    {
-                        registerDatabaseMethod.Invoke(null, [builder.Services, appSettings]);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("RegisterDatabase method not found.");
-                    }
+                    ArgumentNullException.ThrowIfNull(method, nameof(method));
+
+                    var genericMethod = method.MakeGenericMethod(options.DatabaseContextType);
+
+                    genericMethod.Invoke(null, new object[] { builder.Services, appSettings });
                 }
                 else if (options.UseDatabase)
                 {
@@ -71,6 +74,15 @@ namespace Easy.Net.Starter.Startup.Entries
 
                 if (options.UseDatabaseWithBuiltInUserConfiguration && options.UseJwtAuthentication)
                 {
+                    builder.Services.AddScoped<BaseDbContext>(provider =>
+                    {
+                        if (options.DatabaseContextType == null)
+                            throw new InvalidOperationException("DatabaseContextType is not specified.");
+
+                        var dbContextInstance = provider.GetRequiredService(options.DatabaseContextType);
+
+                        return (BaseDbContext)dbContextInstance;
+                    });
                     builder.Services.AddScoped<ITokenService, MyTokenService>();
                     builder.Services.AddScoped<IUserService, UserService>();
                     builder.Services.AddTransient<IClaimsTransformation, UserClaimsTransformation>();

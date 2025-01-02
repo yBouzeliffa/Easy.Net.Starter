@@ -1,4 +1,5 @@
-﻿using Easy.Net.Starter.Extensions;
+﻿using Easy.Net.Starter.EntityFramework;
+using Easy.Net.Starter.Extensions;
 using Easy.Net.Starter.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -60,6 +61,38 @@ namespace Easy.Net.Starter.Startup.Registrators
 
         //Call by reflection
         public static void RegisterDatabase<T>(this IServiceCollection services, AppSettings appSettings) where T : DbContext
+        {
+            try
+            {
+                ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
+
+                var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+
+                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Host"], "Host");
+                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Database"], "Database");
+                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Port"], "Port");
+
+                Log.Logger.Information("[Database] Database server: {0}", connectionParts["Host"]);
+                Log.Logger.Information("[Database] Database: {0}", connectionParts["Database"]);
+                Log.Logger.Information("[Database] Port: {0}", connectionParts["Port"]);
+                Log.Logger.Information("");
+
+                services.AddDbContext<T>(options =>
+                {
+                    options.UseNpgsql(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL).UseSnakeCaseNamingConvention();
+                });
+
+                Log.Logger.Information("Database registered");
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Unable to register the database");
+                throw;
+            }
+        }
+
+        //Call by reflection
+        public static void RegisterDatabaseWithBaseDbContext<T>(this IServiceCollection services, AppSettings appSettings) where T : BaseDbContext
         {
             try
             {

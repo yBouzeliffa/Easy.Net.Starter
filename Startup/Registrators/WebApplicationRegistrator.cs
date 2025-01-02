@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Diagnostics;
 
@@ -64,6 +65,28 @@ namespace Easy.Net.Starter.Startup.Registrators
                 {
                     options.OperationFilter<AddApiKeyHeaderFilter>("X-API-KEY", appSettings.ApiKey.ApiPublicKey);
                     options.OperationFilter<AddReferrerHeaderFilter>("Referer", appSettings.AllowedOrigins.Split(',').ToArray().First());
+                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "Bearer"
+                    });
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new List<string>()
+                        }
+                    });
                 });
 
                 services.AddHealthChecks();
