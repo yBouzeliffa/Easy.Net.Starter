@@ -4,11 +4,6 @@ namespace Easy.Net.Starter.EntityFramework
 {
     public class BaseDbContext : DbContext
     {
-        public BaseDbContext(DbContextOptions<BaseDbContext> options)
-        : base(options)
-        {
-        }
-
         public virtual DbSet<User> Users { get; set; }
 
         protected virtual void ConfigureUser(ModelBuilder modelBuilder)
