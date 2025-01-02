@@ -4,6 +4,7 @@ using Easy.Net.Starter.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Serilog;
 
 namespace Easy.Net.Starter.Startup.Registrators
@@ -77,9 +78,15 @@ namespace Easy.Net.Starter.Startup.Registrators
                 Log.Logger.Information("[Database] Port: {0}", connectionParts["Port"]);
                 Log.Logger.Information("");
 
+                var dataSource = new NpgsqlDataSourceBuilder(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL)
+                  .EnableDynamicJson()
+                  .Build();
+
                 services.AddDbContext<T>(options =>
                 {
-                    options.UseNpgsql(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL).UseSnakeCaseNamingConvention();
+                    options
+                        .UseNpgsql(dataSource)
+                        .UseSnakeCaseNamingConvention();
                 });
 
                 Log.Logger.Information("Database registered");
