@@ -73,6 +73,7 @@
     public class ConnectionStringsSection
     {
         public string APPLICATION_POSTGRE_SQL { get; set; } = string.Empty;
+        public string INSTANCE_MANAGER_POSTGRE_SQL { get; set; } = string.Empty;
     }
 
     public record JwtSection(string Issuer, string Audience, string Key, int MinutesDuration);

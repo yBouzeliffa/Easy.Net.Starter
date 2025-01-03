@@ -279,7 +279,7 @@ namespace Easy.Net.Starter.Startup.Registrators
             }
         }
 
-        private static Dictionary<string, string> ParseConnectionString(string connectionString)
+        public static Dictionary<string, string> ParseConnectionString(string connectionString)
         {
             try
             {

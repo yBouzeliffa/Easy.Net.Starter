@@ -16,7 +16,7 @@ namespace Easy.Net.Starter.Startup.Entries
 {
     public static class WebApiStarter
     {
-        public static WebApplication Start<TAppSettings>(string[] args, StartupOptions options)
+        public static async Task<WebApplication> StartAsync<TAppSettings>(string[] args, StartupOptions options)
             where TAppSettings : AppSettings, new()
         {
             try
@@ -50,6 +50,13 @@ namespace Easy.Net.Starter.Startup.Entries
                     {
                         throw new InvalidOperationException("Database connection failed.");
                     }
+
+                    var connectionParts = ApplicationRegistrator.ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+
+                    ArgumentException.ThrowIfNullOrEmpty(connectionParts["Database"], "Database");
+
+                    var databaseManager = new DatabaseManager(appSettings.ConnectionStrings.INSTANCE_MANAGER_POSTGRE_SQL, connectionParts["Database"]);
+                    await databaseManager.EnsureDatabaseExistsAsync();
 
                     var method = typeof(ApplicationRegistrator).GetMethod(
                        options.UseDatabaseWithBuiltInUserConfiguration ? "RegisterDatabaseWithBaseDbContext" : "RegisterDatabase",
