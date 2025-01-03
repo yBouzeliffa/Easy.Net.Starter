@@ -7,6 +7,7 @@ using Easy.Net.Starter.Startup.Registrators;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Diagnostics;
@@ -127,6 +128,20 @@ namespace Easy.Net.Starter.Startup.Entries
                 app.RegisterMiddlewares(options.Middlewares);
                 app.RegisterExceptionHandler(appSettings);
                 app.UseAppCors();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetRequiredService(options.DatabaseContextType) as DbContext;
+                    try
+                    {
+                        context.Database.Migrate();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Error(ex, "An error occurred while applying database migrations.");
+                        throw;
+                    }
+                }
 
                 Log.Logger.Information("");
                 Log.Logger.Information("╔═══════════════════════════════════════════════════╗");
