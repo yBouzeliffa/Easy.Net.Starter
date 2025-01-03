@@ -46,7 +46,7 @@ namespace Easy.Net.Starter.Startup.Entries
                 {
                     ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
 
-                    if (!appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.TryDatabaseConnection())
+                    if (!appSettings.ConnectionStrings.INSTANCE_MANAGER_POSTGRE_SQL.TryDatabaseConnection())
                     {
                         throw new InvalidOperationException("Database connection failed.");
                     }
