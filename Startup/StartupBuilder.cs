@@ -97,6 +97,7 @@ namespace Easy.Net.Starter.Startup
         {
             return new StartupOptions
             {
+                UseDefaultGenericLogger = _useDefaultGenericLogger,
                 UseJwtAuthentication = _useJwtAuthentication,
                 UseHttpLoggerMiddleware = _useHttpLoggerMiddleware,
                 UseSignalR = _useSignalR,
