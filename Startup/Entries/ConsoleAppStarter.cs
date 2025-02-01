@@ -1,6 +1,7 @@
 ﻿using Easy.Net.Starter.Loggers;
 using Easy.Net.Starter.Models;
 using Easy.Net.Starter.Startup.Registrators;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -10,7 +11,7 @@ namespace Easy.Net.Starter.Startup.Entries
 {
     public static class ConsoleAppStarter
     {
-        public static ServiceProvider Start<TAppSettings>(string[] args, StartupOptions options)
+        public static ServiceProvider? Start<TAppSettings>(string[] args, StartupOptions options)
             where TAppSettings : AppSettings, new()
         {
             try
@@ -33,6 +34,8 @@ namespace Easy.Net.Starter.Startup.Entries
                         .ReadFrom.Configuration(configuration)
                         .WriteTo.File(appSettings.OverrideWriteLogToFile.Replace("{APP_NAME}", Process.GetCurrentProcess().ProcessName));
                 });
+
+                builder.Services.ConfigureDatabase(options, appSettings);
 
                 if (options.UseDefaultGenericLogger)
                     builder.Services.AddScoped<IGenericLogger, GenericLogger>();
@@ -60,6 +63,12 @@ namespace Easy.Net.Starter.Startup.Entries
                 logger.LogInformation("");
                 logger.LogInformation("Version : {Version}", appSettings.Version);
                 logger.LogInformation("");
+
+                if (EF.IsDesignTime)
+                {
+                    logger.LogInformation("Design time detected. Skipping the application startup.");
+                    return null;
+                }
 
                 return serviceProvider;
             }
