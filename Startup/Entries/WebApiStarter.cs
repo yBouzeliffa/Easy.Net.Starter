@@ -78,19 +78,7 @@ namespace Easy.Net.Starter.Startup.Entries
                 app.RegisterExceptionHandler(appSettings);
                 app.UseAppCors();
 
-                using (var scope = app.Services.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService(options.DatabaseContextType) as DbContext;
-                    try
-                    {
-                        context.Database.Migrate();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Logger.Error(ex, "An error occurred while applying database migrations.");
-                        throw;
-                    }
-                }
+                app.Services.ApplyChanges(options);
 
                 Log.Logger.Information("");
                 Log.Logger.Information("╔═══════════════════════════════════════════════════╗");

@@ -70,6 +70,8 @@ namespace Easy.Net.Starter.Startup.Entries
                     return null;
                 }
 
+                serviceProvider.ApplyChanges(options);
+
                 return serviceProvider;
             }
             catch (Exception ex)

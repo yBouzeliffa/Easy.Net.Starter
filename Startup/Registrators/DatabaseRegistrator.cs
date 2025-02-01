@@ -5,13 +5,39 @@ using Easy.Net.Starter.Services;
 using Easy.Net.Starter.Startup.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System.Reflection;
 
 namespace Easy.Net.Starter.Startup.Registrators
 {
     internal static class DatabaseRegistrator
     {
+        public static void ApplyChanges(this IServiceProvider services, StartupOptions options)
+        {
+            if (!options.UseDatabase)
+                return;
+
+            ArgumentNullException.ThrowIfNull(options.DatabaseContextType, nameof(options.DatabaseContextType));
+
+            using var scope = services.CreateScope();
+
+            var context = scope.ServiceProvider.GetRequiredService(options.DatabaseContextType) as DbContext;
+
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            try
+            {
+                context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "An error occurred while applying database migrations.");
+                throw;
+            }
+        }
+
         public static void ConfigureDatabase<TAppSettings>(this WebApplicationBuilder builder, StartupOptions options, TAppSettings appSettings)
             where TAppSettings : AppSettings, new()
         {
@@ -41,7 +67,7 @@ namespace Easy.Net.Starter.Startup.Registrators
                 databaseManager.EnsureDatabaseExistsAsync().Wait();
 
                 var method = typeof(ApplicationRegistrator).GetMethod(
-                   options.UseDatabaseWithBuiltInUserConfiguration ? "RegisterDatabaseWithBaseDbContext" : "RegisterDatabase",
+                    options.UseDatabaseWithBuiltInUserConfiguration ? "RegisterDatabaseWithBaseDbContext" : "RegisterDatabase",
                     BindingFlags.Static | BindingFlags.Public,
                     null,
                     new[] { typeof(IServiceCollection), typeof(AppSettings) },

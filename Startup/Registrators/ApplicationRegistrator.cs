@@ -26,7 +26,6 @@ namespace Easy.Net.Starter.Startup.Registrators
                 configuration.Bind(appSettings);
                 services.AddSingleton(appSettings);
 
-
                 Log.Logger?.Information("Appsettings registered");
 
                 return configurationSettings;
