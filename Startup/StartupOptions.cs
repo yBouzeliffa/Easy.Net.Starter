@@ -2,6 +2,7 @@
 {
     public class StartupOptions
     {
+        public bool UseDefaultGenericLogger { get; set; }
         public bool UseJwtAuthentication { get; set; }
         public bool UseHttpLoggerMiddleware { get; set; }
         public bool UseSignalR { get; set; }

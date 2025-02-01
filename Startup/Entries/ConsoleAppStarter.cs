@@ -34,7 +34,8 @@ namespace Easy.Net.Starter.Startup.Entries
                         .WriteTo.File(appSettings.OverrideWriteLogToFile.Replace("{APP_NAME}", Process.GetCurrentProcess().ProcessName));
                 });
 
-                builder.Services.AddScoped<IGenericLogger, GenericLogger>();
+                if (options.UseDefaultGenericLogger)
+                    builder.Services.AddScoped<IGenericLogger, GenericLogger>();
 
                 var serviceProvider = builder.Services.RegisterServices(
                     options.SingletonServices,

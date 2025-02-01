@@ -10,12 +10,19 @@ namespace Easy.Net.Starter.Startup
         private readonly List<string> _singletonServices = new();
         private readonly List<string> _scopedServices = new();
         private readonly List<string> _transientServices = new();
+        private bool _useDefaultGenericLogger = false;
         private bool _useDatabase = false;
         private bool _useDatabaseWithBuiltInUserConfiguration = false;
         private Type? _databaseContextType = null;
         private bool _useSignalR = false;
         private bool _useHttpLoggerMiddleware = false;
         private bool _useJwtAuthentication = false;
+
+        public StartupBuilder AddDefaultGenericLogger()
+        {
+            _useDefaultGenericLogger = true;
+            return this;
+        }
 
         public StartupBuilder AddJwtAuthentication()
         {
