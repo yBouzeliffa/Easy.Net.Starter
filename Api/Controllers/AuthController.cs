@@ -32,6 +32,25 @@ namespace Easy.Net.Starter.Api.Controllers
             return Unauthorized();
         }
 
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterAsync([FromBody] UserCredentials user)
+        {
+            if (await _userService.AddUser(
+                user.Password,
+                string.Empty,
+                string.Empty,
+                user.Email,
+                string.Empty,
+                default,
+                false,
+                false))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+
         [HttpGet("hash")]
         [IsAdmin]
         public IActionResult HashTest(string password)
