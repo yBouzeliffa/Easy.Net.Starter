@@ -51,6 +51,13 @@ namespace Easy.Net.Starter.Api.Controllers
             return BadRequest();
         }
 
+        [HttpGet("all")]
+        [IsAdmin]
+        public async Task<UserLight[]> GetUsers(CancellationToken cancellationToken)
+        {
+            return await _userService.GetAllUsersAsync(cancellationToken);
+        }
+
         [HttpGet("hash")]
         [IsAdmin]
         public IActionResult HashTest(string password)

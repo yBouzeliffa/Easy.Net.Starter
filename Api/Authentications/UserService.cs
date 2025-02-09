@@ -1,5 +1,6 @@
 ﻿using Easy.Net.Starter.EntityFramework;
 using Easy.Net.Starter.Extensions;
+using Easy.Net.Starter.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Easy.Net.Starter.Api.Authentications
@@ -17,6 +18,8 @@ namespace Easy.Net.Starter.Api.Authentications
             DateTime dateOfBirth,
             bool isAdmin,
             bool isLocked);
+
+        Task<UserLight[]> GetAllUsersAsync(CancellationToken cancellationToken);
     }
     public class UserService(BaseDbContext context) : IUserService
     {
@@ -86,6 +89,15 @@ namespace Easy.Net.Starter.Api.Authentications
             {
                 return false;
             }
+        }
+
+        public async Task<UserLight[]> GetAllUsersAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Users.Select(x => new UserLight
+            {
+                Email = x.Email,
+                Name = x.LastName
+            }).ToArrayAsync(cancellationToken);
         }
     }
 }
