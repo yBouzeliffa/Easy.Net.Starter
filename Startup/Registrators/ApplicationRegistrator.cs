@@ -68,13 +68,13 @@ namespace Easy.Net.Starter.Startup.Registrators
 
                 var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
 
-                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Host"], "Host");
-                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Database"], "Database");
-                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Port"], "Port");
+                connectionParts.TryGetValue("Host", out var host);
+                connectionParts.TryGetValue("Database", out var database);
+                connectionParts.TryGetValue("Port", out var port);
 
-                Log.Logger.Information("[Database] Database server: {0}", connectionParts["Host"]);
-                Log.Logger.Information("[Database] Database: {0}", connectionParts["Database"]);
-                Log.Logger.Information("[Database] Port: {0}", connectionParts["Port"]);
+                Log.Logger.Information("[Database] Database server: {0}", host);
+                Log.Logger.Information("[Database] Database: {0}", database);
+                Log.Logger.Information("[Database] Port: {0}", port);
                 Log.Logger.Information("");
 
                 var dataSource = new NpgsqlDataSourceBuilder(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL)
@@ -106,13 +106,13 @@ namespace Easy.Net.Starter.Startup.Registrators
 
                 var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
 
-                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Host"], "Host");
-                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Database"], "Database");
-                ArgumentException.ThrowIfNullOrEmpty(connectionParts["Port"], "Port");
+                connectionParts.TryGetValue("Host", out var host);
+                connectionParts.TryGetValue("Database", out var database);
+                connectionParts.TryGetValue("Port", out var port);
 
-                Log.Logger.Information("[Database] Database server: {0}", connectionParts["Host"]);
-                Log.Logger.Information("[Database] Database: {0}", connectionParts["Database"]);
-                Log.Logger.Information("[Database] Port: {0}", connectionParts["Port"]);
+                Log.Logger.Information("[Database] Database server: {0}", host);
+                Log.Logger.Information("[Database] Database: {0}", database);
+                Log.Logger.Information("[Database] Port: {0}", port);
                 Log.Logger.Information("");
 
                 services.AddDbContext<T>(options =>
