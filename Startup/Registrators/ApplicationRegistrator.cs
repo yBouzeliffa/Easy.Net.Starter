@@ -1,6 +1,7 @@
 ﻿using Easy.Net.Starter.EntityFramework;
 using Easy.Net.Starter.Extensions;
 using Easy.Net.Starter.Models;
+using Easy.Net.Starter.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,7 +67,9 @@ namespace Easy.Net.Starter.Startup.Registrators
             {
                 ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
 
-                var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.UpdateConnectionPassword();
+
+                var connectionParts = ParseConnectionString(applicationConnectionString);
 
                 connectionParts.TryGetValue("Host", out var host);
                 connectionParts.TryGetValue("Database", out var database);
@@ -77,7 +80,7 @@ namespace Easy.Net.Starter.Startup.Registrators
                 Log.Logger.Information("[Database] Port: {0}", port);
                 Log.Logger.Information("");
 
-                var dataSource = new NpgsqlDataSourceBuilder(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL)
+                var dataSource = new NpgsqlDataSourceBuilder(applicationConnectionString)
                   .EnableDynamicJson()
                   .Build();
 
@@ -104,7 +107,9 @@ namespace Easy.Net.Starter.Startup.Registrators
             {
                 ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
 
-                var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.UpdateConnectionPassword();
+
+                var connectionParts = ParseConnectionString(applicationConnectionString);
 
                 connectionParts.TryGetValue("Host", out var host);
                 connectionParts.TryGetValue("Database", out var database);
@@ -117,7 +122,7 @@ namespace Easy.Net.Starter.Startup.Registrators
 
                 services.AddDbContext<T>(options =>
                 {
-                    options.UseNpgsql(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL).UseSnakeCaseNamingConvention();
+                    options.UseNpgsql(applicationConnectionString).UseSnakeCaseNamingConvention();
                 });
 
                 Log.Logger.Information("Database registered");

@@ -1,34 +1,45 @@
 ﻿using System.Diagnostics;
 
-public static class DatabaseSecurity
+namespace Easy.Net.Starter.Services
 {
-    public static string GetDatabasePassword()
+    public static class DatabaseSecurity
     {
-        string appName = Process.GetCurrentProcess().ProcessName;
-        if (string.IsNullOrEmpty(appName))
+        public static string UpdateConnectionPassword(this string connectionString)
         {
-            throw new InvalidOperationException("Impossible de déterminer le nom de l'application.");
+            string password = GetDatabasePassword();
+            return connectionString.Replace("{{DATABASE_PASSWORD}}", password);
         }
 
-        string envVarName = $"DATABASE_{appName.ToUpper()}";
-
-        string password = Environment.GetEnvironmentVariable(envVarName);
-
-        if (string.IsNullOrEmpty(password))
+        public static string GetDatabasePassword()
         {
-            if (Environment.UserInteractive)
+            string appName = Process.GetCurrentProcess().ProcessName;
+            if (string.IsNullOrEmpty(appName))
             {
-                Console.Write("Veuillez saisir le mot de passe de la base de données : ");
-                password = Console.ReadLine();
+                throw new InvalidOperationException("Impossible de déterminer le nom de l'application.");
+            }
 
-                Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.Process);
-            }
-            else
+            string envVarName = $"DATABASE_{appName.ToUpper()}";
+
+            string password = Environment.GetEnvironmentVariable(envVarName);
+
+            if (string.IsNullOrEmpty(password))
             {
-                throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
+                if (Environment.UserInteractive)
+                {
+                    Console.Write("Veuillez saisir le mot de passe de la base de données : ");
+                    password = Console.ReadLine();
+
+                    Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.Process);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
+                }
             }
+
+            ArgumentException.ThrowIfNullOrEmpty(password, "Le mot de passe de la base de données n'est pas défini.");
+
+            return password;
         }
-
-        return password;
     }
 }
