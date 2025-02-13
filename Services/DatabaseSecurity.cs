@@ -29,7 +29,7 @@ namespace Easy.Net.Starter.Services
                 {
                     password = AnsiConsole.Prompt(new TextPrompt<string>("[yellow]Database Password:[/]").Secret());
 
-                    Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.Machine);
+                    Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.User);
                 }
                 else
                 {
