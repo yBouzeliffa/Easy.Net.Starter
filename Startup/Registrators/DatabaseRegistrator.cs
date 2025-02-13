@@ -54,16 +54,23 @@ namespace Easy.Net.Starter.Startup.Registrators
             {
                 ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
 
-                if (!appSettings.ConnectionStrings.INSTANCE_MANAGER_POSTGRE_SQL.TryDatabaseConnection())
+                var password = DatabaseSecurity.GetDatabasePassword();
+
+                ArgumentException.ThrowIfNullOrEmpty(password, "Database password is not set.");
+
+                var instanceManagerConnectionString = appSettings.ConnectionStrings.INSTANCE_MANAGER_POSTGRE_SQL.Replace("{{DATABASE_PASSWORD}}", password);
+                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.Replace("{{DATABASE_PASSWORD}}", password);
+
+                if (!instanceManagerConnectionString.TryDatabaseConnection())
                 {
                     throw new InvalidOperationException("Database connection failed.");
                 }
 
-                var connectionParts = ApplicationRegistrator.ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
+                var connectionParts = ApplicationRegistrator.ParseConnectionString(applicationConnectionString);
 
                 ArgumentException.ThrowIfNullOrEmpty(connectionParts["Database"], "Database");
 
-                var databaseManager = new DatabaseManager(appSettings.ConnectionStrings.INSTANCE_MANAGER_POSTGRE_SQL, connectionParts["Database"]);
+                var databaseManager = new DatabaseManager(instanceManagerConnectionString, connectionParts["Database"]);
                 databaseManager.EnsureDatabaseExistsAsync().Wait();
 
                 var method = typeof(ApplicationRegistrator).GetMethod(
