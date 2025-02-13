@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Spectre.Console;
+using System.Diagnostics;
 
 namespace Easy.Net.Starter.Services
 {
@@ -26,10 +27,9 @@ namespace Easy.Net.Starter.Services
             {
                 if (Environment.UserInteractive)
                 {
-                    Console.Write("Veuillez saisir le mot de passe de la base de données : ");
-                    password = Console.ReadLine();
+                    password = AnsiConsole.Prompt(new TextPrompt<string>("[yellow]Database Password:[/]").Secret());
 
-                    Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.Machine);
                 }
                 else
                 {
