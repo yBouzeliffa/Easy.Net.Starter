@@ -10,7 +10,7 @@ namespace Easy.Net.Starter.PostgreSQL
     {
         Task CreateBackup();
     }
-    public class DatabaseBackupService
+    public class DatabaseBackupService : IDatabaseBackupService
     {
         private readonly AppSettings appSettings;
         private readonly ILogger<DatabaseBackupService> logger;
