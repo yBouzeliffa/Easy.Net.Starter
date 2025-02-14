@@ -9,11 +9,11 @@
         public string AllowedHeaders { get; set; } = string.Empty;
         public string AllowedMethods { get; set; } = string.Empty;
         public string Version { get; set; } = string.Empty;
+        public string DatabaseBackupPath { get; set; } = string.Empty;
 
         public ConnectionStringsSection ConnectionStrings { get; set; } = new();
         public JwtSection Jwt { get; set; } = new("", "", "", 0);
         public ApiKeySection ApiKey { get; set; } = new();
-        public PostgreSection Postgre { get; set; } = new();
         public ServerSection Server { get; set; } = new();
     }
 

@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Easy.Net.Starter.Services
 {
-    public static class DatabaseSecurity
+    public static class ConnectionStringsSecurityManager
     {
         public static string UpdateConnectionPassword(this string connectionString)
         {
@@ -14,10 +14,8 @@ namespace Easy.Net.Starter.Services
         public static string GetDatabasePassword()
         {
             string appName = Process.GetCurrentProcess().ProcessName;
-            if (string.IsNullOrEmpty(appName))
-            {
-                throw new InvalidOperationException("Impossible de déterminer le nom de l'application.");
-            }
+
+            ArgumentException.ThrowIfNullOrEmpty(appName, "Impossible de déterminer le nom de l'application.");
 
             string envVarName = $"DATABASE_{appName.ToUpper()}";
 
@@ -31,10 +29,8 @@ namespace Easy.Net.Starter.Services
 
                     Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.User);
                 }
-                else
-                {
-                    throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
-                }
+
+                throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
             }
 
             ArgumentException.ThrowIfNullOrEmpty(password, "Le mot de passe de la base de données n'est pas défini.");
