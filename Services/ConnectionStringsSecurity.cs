@@ -29,8 +29,10 @@ namespace Easy.Net.Starter.Services
 
                     Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.User);
                 }
-
-                throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
+                else
+                {
+                    throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
+                }
             }
 
             ArgumentException.ThrowIfNullOrEmpty(password, "Le mot de passe de la base de données n'est pas défini.");
