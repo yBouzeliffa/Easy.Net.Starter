@@ -31,15 +31,26 @@ namespace Easy.Net.Starter.PostgreSQL
                     string timestamp = DateTime.UtcNow.ToString("yyyyMMdd");
 
                     var connectionStringParts = ApplicationRegistrator.ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
-                    var password = ConnectionStringsSecurityManager.GetDatabasePassword();
-                    var backupName = appSettings.DatabaseBackupPath.Replace("{DATABASE_NAME}", connectionStringParts["Database"]).Replace("{timestamp}", timestamp);
+
+                    connectionStringParts.TryGetValue("Database", out var databaseName);
+                    connectionStringParts.TryGetValue("Host", out var host);
+                    connectionStringParts.TryGetValue("Username", out var username);
+
+                    if (string.IsNullOrEmpty(databaseName) || string.IsNullOrEmpty(host) || string.IsNullOrEmpty(username))
+                    {
+                        logger.LogError("Database connection string is not valid.");
+                        return;
+                    }
+
+                    var password = ConnectionStringsSecurityManager.GetDatabasePassword(databaseName);
+
+                    var backupName = appSettings.DatabaseBackupPath.Replace("{DATABASE_NAME}", databaseName).Replace("{timestamp}", timestamp);
 
                     BackupPathHelper.EnsureDirectoryExistsForFile(backupName);
 
                     using var process = new Process();
-
                     process.StartInfo.FileName = PgDumpFinder.FindPgDumpPath();
-                    process.StartInfo.Arguments = $"-h {connectionStringParts["Host"]} -U {connectionStringParts["Username"]} -Fc -f \"{backupName}\" {connectionStringParts["Database"]}";
+                    process.StartInfo.Arguments = $"-h {host} -U {username} -Fc -f \"{backupName}\" {databaseName}";
                     process.StartInfo.EnvironmentVariables["PGPASSWORD"] = password;
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;

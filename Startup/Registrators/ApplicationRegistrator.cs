@@ -67,13 +67,17 @@ namespace Easy.Net.Starter.Startup.Registrators
             {
                 ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
 
-                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.UpdateConnectionPassword();
-
-                var connectionParts = ParseConnectionString(applicationConnectionString);
+                var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
 
                 connectionParts.TryGetValue("Host", out var host);
                 connectionParts.TryGetValue("Database", out var database);
                 connectionParts.TryGetValue("Port", out var port);
+
+                ArgumentException.ThrowIfNullOrEmpty(host, nameof(host));
+                ArgumentException.ThrowIfNullOrEmpty(database, nameof(database));
+
+                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.UpdateConnectionPassword(database);
+
 
                 Log.Logger.Information("[Database] Database server: {0}", host);
                 Log.Logger.Information("[Database] Database: {0}", database);
@@ -107,13 +111,16 @@ namespace Easy.Net.Starter.Startup.Registrators
             {
                 ArgumentException.ThrowIfNullOrEmpty(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL, nameof(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL));
 
-                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.UpdateConnectionPassword();
-
-                var connectionParts = ParseConnectionString(applicationConnectionString);
+                var connectionParts = ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
 
                 connectionParts.TryGetValue("Host", out var host);
                 connectionParts.TryGetValue("Database", out var database);
                 connectionParts.TryGetValue("Port", out var port);
+
+                ArgumentException.ThrowIfNullOrEmpty(host, nameof(host));
+                ArgumentException.ThrowIfNullOrEmpty(database, nameof(database));
+
+                var applicationConnectionString = appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL.UpdateConnectionPassword(database);
 
                 Log.Logger.Information("[Database] Database server: {0}", host);
                 Log.Logger.Information("[Database] Database: {0}", database);

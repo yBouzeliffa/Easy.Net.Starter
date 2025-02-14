@@ -1,23 +1,18 @@
 ﻿using Spectre.Console;
-using System.Diagnostics;
 
 namespace Easy.Net.Starter.Services
 {
     public static class ConnectionStringsSecurityManager
     {
-        public static string UpdateConnectionPassword(this string connectionString)
+        public static string UpdateConnectionPassword(this string connectionString, string databaseName)
         {
-            string password = GetDatabasePassword();
+            string password = GetDatabasePassword(databaseName);
             return connectionString.Replace("{{DATABASE_PASSWORD}}", password);
         }
 
-        public static string GetDatabasePassword()
+        public static string GetDatabasePassword(string databaseName)
         {
-            string appName = Process.GetCurrentProcess().ProcessName;
-
-            ArgumentException.ThrowIfNullOrEmpty(appName, "Impossible de déterminer le nom de l'application.");
-
-            string envVarName = $"DATABASE_{appName.ToUpper()}";
+            string envVarName = $"DATABASE_{databaseName.ToUpper()}";
 
             string password = Environment.GetEnvironmentVariable(envVarName);
 
