@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Easy.Net.Starter.PostgreSQL
 {
-    interface IDatabaseBackupService
+    public interface IDatabaseBackupService
     {
         Task CreateBackup();
     }
@@ -33,6 +33,8 @@ namespace Easy.Net.Starter.PostgreSQL
                     var connectionStringParts = ApplicationRegistrator.ParseConnectionString(appSettings.ConnectionStrings.APPLICATION_POSTGRE_SQL);
                     var password = ConnectionStringsSecurityManager.GetDatabasePassword();
                     var backupName = appSettings.DatabaseBackupPath.Replace("{DATABASE_NAME}", connectionStringParts["Database"]).Replace("{timestamp}", timestamp);
+
+                    BackupPathHelper.EnsureDirectoryExistsForFile(backupName);
 
                     using var process = new Process();
 

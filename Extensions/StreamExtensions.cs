@@ -1,4 +1,4 @@
-﻿namespace Goldweb.Core.Extensions
+﻿namespace Easy.Net.Starter.Extensions
 {
     public static class StreamExtensions
     {
