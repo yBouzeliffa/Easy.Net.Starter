@@ -1,5 +1,5 @@
 ﻿using Easy.Net.Starter.Models;
-using Easy.Net.Starter.Services;
+using Easy.Net.Starter.Security;
 using Easy.Net.Starter.Startup.Registrators;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;

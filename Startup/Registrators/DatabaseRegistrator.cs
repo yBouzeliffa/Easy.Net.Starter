@@ -1,6 +1,7 @@
 ﻿using Easy.Net.Starter.Api.Authentications;
 using Easy.Net.Starter.EntityFramework;
 using Easy.Net.Starter.Models;
+using Easy.Net.Starter.Security;
 using Easy.Net.Starter.Services;
 using Easy.Net.Starter.Startup.Helpers;
 using Microsoft.AspNetCore.Authentication;

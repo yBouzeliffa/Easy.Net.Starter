@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 
-namespace Easy.Net.Starter.Services
+namespace Easy.Net.Starter.Security
 {
     public static class ConnectionStringsSecurityManager
     {
@@ -14,7 +14,7 @@ namespace Easy.Net.Starter.Services
         {
             string envVarName = $"DATABASE_{databaseName.ToUpper()}";
 
-            string password = Environment.GetEnvironmentVariable(envVarName);
+            string password = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
 
             if (string.IsNullOrEmpty(password))
             {

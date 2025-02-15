@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Easy.Net.Starter.Api.Controllers
@@ -12,6 +13,7 @@ namespace Easy.Net.Starter.Api.Controllers
         }
 
         [HttpGet("version")]
+        [AllowAnonymous]
         public IActionResult GetVersion()
         {
             return Ok(_appSettings.Version);

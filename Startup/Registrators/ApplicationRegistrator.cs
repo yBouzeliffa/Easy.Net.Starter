@@ -1,7 +1,7 @@
 ﻿using Easy.Net.Starter.EntityFramework;
 using Easy.Net.Starter.Extensions;
 using Easy.Net.Starter.Models;
-using Easy.Net.Starter.Services;
+using Easy.Net.Starter.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
