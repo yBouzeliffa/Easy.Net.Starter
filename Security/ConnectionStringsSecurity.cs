@@ -14,7 +14,7 @@ namespace Easy.Net.Starter.Security
         {
             string envVarName = $"DATABASE_{databaseName.ToUpper()}";
 
-            string password = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            string? password = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
 
             if (string.IsNullOrEmpty(password))
             {
