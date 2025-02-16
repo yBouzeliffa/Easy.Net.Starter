@@ -1,8 +1,16 @@
 ﻿namespace Easy.Net.Starter.Models
 {
-    public class UserLight
+    public record UserLight
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public Guid Id { get; init; } = Guid.Empty;
+        public string Email { get; init; } = string.Empty;
+        public string? Name { get; init; }
+
+        public UserLight(Guid id, string email, string? name)
+        {
+            Id = id;
+            Email = email;
+            Name = name;
+        }
     }
 }

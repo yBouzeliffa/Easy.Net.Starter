@@ -93,11 +93,9 @@ namespace Easy.Net.Starter.Api.Authentications
 
         public async Task<UserLight[]> GetAllUsersAsync(CancellationToken cancellationToken)
         {
-            return await _context.Users.Select(x => new UserLight
-            {
-                Email = x.Email,
-                Name = x.LastName
-            }).ToArrayAsync(cancellationToken);
+            return await _context.Users
+                .Select(x => new UserLight(x.Id, x.Email, x.LastName))
+                .ToArrayAsync(cancellationToken);
         }
     }
 }

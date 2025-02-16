@@ -20,13 +20,13 @@ namespace Easy.Net.Starter.Api.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginAsync([FromBody] UserCredentials credentials)
+        public async Task<ActionResult<UserToken>> LoginAsync([FromBody] UserCredentials credentials)
         {
             if (await _userService.IsValidUser(credentials.Email, credentials.Password))
             {
                 var Id = await _userService.GetIdByEmail(credentials.Email);
                 var token = _tokenService.GenerateToken(Id.ToString());
-                return Ok(new { token });
+                return Ok(new UserToken(token));
             }
 
             return Unauthorized();
@@ -48,6 +48,7 @@ namespace Easy.Net.Starter.Api.Controllers
             {
                 return Ok();
             }
+
             return BadRequest();
         }
 
