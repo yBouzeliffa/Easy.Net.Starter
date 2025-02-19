@@ -12,8 +12,7 @@ namespace Easy.Net.Starter.Security
 
         public static string GetDatabasePassword(string databaseName)
         {
-            string envVarName = $"DATABASE_{databaseName.ToUpper()}";
-
+            string envVarName = $"DATABASE_{databaseName.Replace("-", "_").ToUpper()}";
 
             string? password = Environment.GetEnvironmentVariable(envVarName);
 
