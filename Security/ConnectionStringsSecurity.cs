@@ -14,19 +14,23 @@ namespace Easy.Net.Starter.Security
         {
             string envVarName = $"DATABASE_{databaseName.ToUpper()}";
 
-            string? password = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+
+            string? password = Environment.GetEnvironmentVariable(envVarName);
 
             if (string.IsNullOrEmpty(password))
             {
-                if (Environment.UserInteractive)
+                if (Console.IsInputRedirected)
                 {
-                    password = AnsiConsole.Prompt(new TextPrompt<string>("[yellow]Database Password:[/]").Secret());
-
-                    Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.User);
+                    throw new InvalidOperationException(
+                        $"La variable d'environnement {envVarName} n'est pas définie et l'entrée interactive n'est pas disponible.");
                 }
                 else
                 {
-                    throw new InvalidOperationException($"La variable d'environnement {envVarName} n'est pas définie.");
+                    password = AnsiConsole.Prompt(
+                        new TextPrompt<string>("[yellow]Database Password:[/]")
+                            .Secret());
+
+                    Environment.SetEnvironmentVariable(envVarName, password);
                 }
             }
 

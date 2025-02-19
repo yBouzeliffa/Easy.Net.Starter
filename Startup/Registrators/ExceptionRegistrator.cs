@@ -73,10 +73,6 @@ namespace Easy.Net.Starter.Startup.Registrators
                             context.Response.StatusCode = int.TryParse(devTechnicalExceptionResult.ErrorCode, out int code) ? code : 500;
                             await context.Response.WriteAsync(devTechnicalExceptionResult.ToString());
                         }
-                        app.Logger.LogError(contextFeature.Error.InnerException?.Message);
-                        app.Logger.LogError(contextFeature.Error.TargetSite?.ToString());
-                        app.Logger.LogError(contextFeature.Error.HelpLink?.ToString());
-                        app.Logger.LogError(contextFeature.Error.Message);
                     }
                 });
             });
@@ -120,10 +116,6 @@ namespace Easy.Net.Starter.Startup.Registrators
                             context.Response.StatusCode = int.TryParse(devTechnicalExceptionResult.ErrorCode, out int code) ? code : 500;
                             await context.Response.WriteAsync(devTechnicalExceptionResult.ToString());
                         }
-                        app.Logger.LogError(contextFeature.Error.InnerException?.Message);
-                        app.Logger.LogError(contextFeature.Error.TargetSite?.ToString());
-                        app.Logger.LogError(contextFeature.Error.HelpLink?.ToString());
-                        app.Logger.LogError(contextFeature.Error.Message);
                     }
                 });
             });
