@@ -1,13 +1,13 @@
 ﻿using Easy.Net.Starter.Api.Swagger;
 using Easy.Net.Starter.Extensions;
 using Easy.Net.Starter.Models;
+using Easy.Net.Starter.Startup.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Diagnostics;
 
 namespace Easy.Net.Starter.Startup.Registrators
 {
@@ -36,14 +36,17 @@ namespace Easy.Net.Starter.Startup.Registrators
         {
             try
             {
-                var overrideWriteLogToFile = configuration["OverrideWriteLogToFile"];
-
-                ArgumentException.ThrowIfNullOrEmpty(overrideWriteLogToFile, nameof(overrideWriteLogToFile));
+                var args = SerilogHelper.ExtractConfiguration(configuration);
 
                 Log.Logger = new LoggerConfiguration()
                     .ReadFrom.Configuration(configuration)
-                    .WriteTo.File(overrideWriteLogToFile.Replace("{APP_NAME}", Process.GetCurrentProcess().ProcessName))
+                    .WriteTo.File(
+                        args.Path,
+                        rollingInterval: args.RollingInternalEnum,
+                        fileSizeLimitBytes: args.FileSizeLimitBytes,
+                        retainedFileCountLimit: args.RetainedFileCountLimit)
                     .CreateLogger();
+
                 host.UseSerilog();
 
                 Log.Logger.Information("Serilog registered");

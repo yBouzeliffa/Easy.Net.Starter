@@ -4,8 +4,6 @@ using Easy.Net.Starter.Startup.Registrators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Serilog;
-using System.Diagnostics;
 
 namespace Easy.Net.Starter.Startup.Entries
 {
@@ -26,14 +24,7 @@ namespace Easy.Net.Starter.Startup.Entries
 
                 var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(configuration);
 
-                ArgumentException.ThrowIfNullOrEmpty(appSettings.OverrideWriteLogToFile, nameof(appSettings));
-
-                builder.Services.AddSerilog(config =>
-                {
-                    config
-                        .ReadFrom.Configuration(configuration)
-                        .WriteTo.File(appSettings.OverrideWriteLogToFile.Replace("{APP_NAME}", Process.GetCurrentProcess().ProcessName));
-                });
+                builder.Services.AddSerilogConsoleApp(configuration);
 
                 builder.Services.ConfigureDatabase(options, appSettings);
 

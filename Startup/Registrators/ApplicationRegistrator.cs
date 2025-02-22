@@ -2,6 +2,7 @@
 using Easy.Net.Starter.Extensions;
 using Easy.Net.Starter.Models;
 using Easy.Net.Starter.Security;
+using Easy.Net.Starter.Startup.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +60,33 @@ namespace Easy.Net.Starter.Startup.Registrators
                 throw;
             }
         }
+
+        public static IServiceCollection AddSerilogConsoleApp(this IServiceCollection services, IConfiguration configuration)
+        {
+            try
+            {
+                var args = SerilogHelper.ExtractConfiguration(configuration);
+
+                services.AddSerilog(config =>
+                {
+                    config
+                        .ReadFrom.Configuration(configuration)
+                        .WriteTo.File(args.Path,
+                            rollingInterval: args.RollingInternalEnum,
+                            fileSizeLimitBytes: args.FileSizeLimitBytes,
+                            retainedFileCountLimit: args.RetainedFileCountLimit);
+                });
+
+                Log.Logger.Information("Serilog registered");
+
+                return services;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Unable to register Serilog", ex);
+            }
+        }
+
 
         //Call by reflection
         public static void RegisterDatabase<T>(this IServiceCollection services, AppSettings appSettings) where T : DbContext

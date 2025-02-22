@@ -1,4 +1,6 @@
-﻿namespace Easy.Net.Starter.Models
+﻿using Serilog;
+
+namespace Easy.Net.Starter.Models
 {
     public partial class AppSettings
     {
@@ -68,6 +70,19 @@
         public string RollingInterval { get; set; } = string.Empty;
         public long FileSizeLimitBytes { get; set; } = new();
         public int RetainedFileCountLimit { get; set; } = new();
+
+        public RollingInterval RollingInternalEnum
+        {
+            get
+            {
+                if (Enum.TryParse(RollingInterval, out RollingInterval parsed))
+                {
+                    return parsed;
+                }
+
+                throw new InvalidOperationException("Unable to parse rolling interval");
+            }
+        }
     }
 
     public class ConnectionStringsSection
