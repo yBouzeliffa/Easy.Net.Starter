@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System.Diagnostics;
 
 namespace Easy.Net.Starter.Startup.Entries
 {
@@ -69,7 +68,7 @@ namespace Easy.Net.Starter.Startup.Entries
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
                 });
 
-                app.RegisterApplicationCapabilities(Process.GetCurrentProcess().ProcessName);
+                app.RegisterApplicationCapabilities();
 
                 if (options.UseHttpLoggerMiddleware)
                     app.UseMiddleware<HttpLoggerMiddleware>();

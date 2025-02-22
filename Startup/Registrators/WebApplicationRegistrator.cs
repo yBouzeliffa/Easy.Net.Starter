@@ -103,12 +103,10 @@ namespace Easy.Net.Starter.Startup.Registrators
             }
         }
 
-        public static void RegisterApplicationCapabilities(this WebApplication application, string apiName)
+        public static void RegisterApplicationCapabilities(this WebApplication application)
         {
             try
             {
-                ArgumentException.ThrowIfNullOrEmpty(apiName, nameof(apiName));
-
                 application.UseHttpsRedirection();
                 application.UseAuthentication();
                 application.UseAuthorization();
