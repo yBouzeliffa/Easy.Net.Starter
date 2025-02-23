@@ -1,4 +1,5 @@
 ﻿using Spectre.Console;
+using System.Runtime.InteropServices;
 
 namespace Easy.Net.Starter.Security
 {
@@ -14,7 +15,11 @@ namespace Easy.Net.Starter.Security
         {
             string envVarName = $"DATABASE_{databaseName.Replace("-", "_").ToUpper()}";
 
-            string? password = Environment.GetEnvironmentVariable(envVarName);
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+            string? password = isWindows
+                ? Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User)
+                : Environment.GetEnvironmentVariable(envVarName);
 
             if (string.IsNullOrEmpty(password))
             {
@@ -29,7 +34,14 @@ namespace Easy.Net.Starter.Security
                         new TextPrompt<string>("[yellow]Database Password:[/]")
                             .Secret());
 
-                    Environment.SetEnvironmentVariable(envVarName, password);
+                    if (isWindows)
+                    {
+                        Environment.SetEnvironmentVariable(envVarName, password, EnvironmentVariableTarget.User);
+                    }
+                    else
+                    {
+                        Environment.SetEnvironmentVariable(envVarName, password);
+                    }
                 }
             }
 
