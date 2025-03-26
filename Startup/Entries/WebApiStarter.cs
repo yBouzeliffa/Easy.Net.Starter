@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.Models;
+using Easy.Net.Starter.Services;
 using Easy.Net.Starter.Startup.Registrators;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -58,6 +59,8 @@ namespace Easy.Net.Starter.Startup.Entries
                     options.ScopedWithInterfaces,
                     options.TransientsWithInterfaces);
 
+                builder.Services.AddScoped<IUserContextService, UserContextService>();
+
                 if (options.UseJwtAuthentication)
                     builder.Services.ConfigureAuthentication(appSettings);
 
@@ -77,7 +80,7 @@ namespace Easy.Net.Starter.Startup.Entries
                 app.RegisterExceptionHandler(appSettings);
                 app.UseAppCors();
 
-                app.Services.ApplyChanges(options);
+                app.Services.ApplyDbMigrationsChanges(options);
 
                 Log.Logger.Information("");
                 Log.Logger.Information("╔═══════════════════════════════════════════════════╗");

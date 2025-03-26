@@ -15,7 +15,7 @@ namespace Easy.Net.Starter.Startup.Registrators
 {
     internal static class DatabaseRegistrator
     {
-        public static void ApplyChanges(this IServiceProvider services, StartupOptions options)
+        public static void ApplyDbMigrationsChanges(this IServiceProvider services, StartupOptions options)
         {
             if (!options.UseDatabase)
                 return;

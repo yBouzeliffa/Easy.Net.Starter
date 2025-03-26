@@ -24,13 +24,7 @@ namespace Easy.Net.Starter.Models
 
         public bool IsLocked { get; set; }
 
-        public string DisplayName
-        {
-            get
-            {
-                return $"{FirstName} {LastName}".Trim();
-            }
-        }
+        public string DisplayName => $"{FirstName} {LastName}".Trim();
 
         public ConnectedUser FromClaims(ClaimsIdentity identity)
         {

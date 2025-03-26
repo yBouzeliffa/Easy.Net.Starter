@@ -1,8 +1,14 @@
-﻿namespace Easy.Net.Starter.Models
+﻿using System.Net;
+
+namespace Easy.Net.Starter.Models
 {
     public class OpeResult<T> : Result<T, OpeError>
     {
         public OpeResult(bool isSuccess, T? value, OpeError? error) : base(isSuccess, value, error)
+        {
+        }
+
+        public OpeResult(bool isSuccess, T? value, OpeError? error, HttpStatusCode httpStatusCode) : base(isSuccess, value, error, httpStatusCode)
         {
         }
 
@@ -15,6 +21,6 @@
         }
 
         public static new OpeResult<T> Success(T value) => new(true, value, default);
-        public static OpeResult<T> Failure(Exception ex, string message) => new(false, default, new(ex, message));
+        public static OpeResult<T> Failure(Exception ex, string message, HttpStatusCode httpStatusCode = HttpStatusCode.BadRequest) => new(false, default, new(ex, message), httpStatusCode);
     }
 }

@@ -62,6 +62,7 @@ namespace Easy.Net.Starter.Startup.Registrators
             try
             {
                 services.AddControllers();
+                services.AddHttpContextAccessor();
                 services.AddLogging();
                 services.AddEndpointsApiExplorer();
                 services.AddSwaggerGen(options =>

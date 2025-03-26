@@ -61,7 +61,7 @@ namespace Easy.Net.Starter.Startup.Entries
                     return null;
                 }
 
-                serviceProvider.ApplyChanges(options);
+                serviceProvider.ApplyDbMigrationsChanges(options);
 
                 return serviceProvider;
             }

@@ -23,5 +23,13 @@ namespace Easy.Net.Starter.Api.Controllers
 
             return user;
         }
+
+        protected ActionResult<T> OpeResponse<T>(OpeResult<T> result)
+        {
+            if (result.IsSuccess)
+                return Ok(result.Value);
+
+            return StatusCode((int)result.GetHttpStatusCode(), result.Error);
+        }
     }
 }

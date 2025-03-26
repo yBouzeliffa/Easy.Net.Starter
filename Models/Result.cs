@@ -6,10 +6,10 @@ namespace Easy.Net.Starter.Models
     {
         private T? _value;
         private TError? _error;
+        private HttpStatusCode _httpCode = HttpStatusCode.OK;
 
         public bool IsSuccess { get; }
 
-        public HttpStatusCode HttpCode = HttpStatusCode.OK;
 
         public T Value
         {
@@ -23,15 +23,12 @@ namespace Easy.Net.Starter.Models
             private set => _error = value;
         }
 
-        protected Result(bool isSuccess, T? value, TError? error) => (IsSuccess, _value, _error) = (isSuccess, value, error);
+        public HttpStatusCode GetHttpStatusCode() => IsSuccess ? HttpStatusCode.OK : _httpCode;
 
-        public Result<T, TError> WithHttpStatusCode(HttpStatusCode httpStatusCode)
-        {
-            HttpCode = httpStatusCode;
-            return this;
-        }
+        protected Result(bool isSuccess, T? value, TError? error) => (IsSuccess, _value, _error) = (isSuccess, value, error);
+        protected Result(bool isSuccess, T? value, TError? error, HttpStatusCode httpStatusCode) => (IsSuccess, _value, _error, _httpCode) = (isSuccess, value, error, httpStatusCode);
 
         public static Result<T, TError> Success(T value) => new(true, value, default);
-        public static Result<T, TError> Failure(TError error) => new(false, default, error);
+        public static Result<T, TError> Failure(TError error, HttpStatusCode httpStatusCode = HttpStatusCode.OK) => new(false, default, error, httpStatusCode);
     }
 }
