@@ -1,5 +1,4 @@
-﻿using LanguageExt;
-using System.Net;
+﻿using System.Net;
 
 namespace Easy.Net.Starter.Models
 {
@@ -10,7 +9,7 @@ namespace Easy.Net.Starter.Models
 
         public bool IsSuccess { get; }
 
-        public Option<HttpStatusCode> HttpCode = Prelude.Some(HttpStatusCode.OK);
+        public HttpStatusCode HttpCode = HttpStatusCode.OK;
 
         public T Value
         {
