@@ -23,7 +23,13 @@ namespace Easy.Net.Starter.Models
             private set => _error = value;
         }
 
-        private Result(bool isSuccess, T? value, TError? error) => (IsSuccess, _value, _error) = (isSuccess, value, error);
+        protected Result(bool isSuccess, T? value, TError? error) => (IsSuccess, _value, _error) = (isSuccess, value, error);
+
+        public Result<T, TError> WithHttpStatusCode(HttpStatusCode httpStatusCode)
+        {
+            HttpCode = httpStatusCode;
+            return this;
+        }
 
         public static Result<T, TError> Success(T value) => new(true, value, default);
         public static Result<T, TError> Failure(TError error) => new(false, default, error);

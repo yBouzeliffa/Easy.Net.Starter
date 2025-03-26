@@ -6,6 +6,12 @@
 
         public string Message { get; set; } = null!;
 
-        public Dictionary<string, string> Metadatas { get; set; } = new Dictionary<string, string>();
+        public OpeError(Exception exception, string message)
+        {
+            Exception = exception;
+            Message = message;
+        }
+
+        public Dictionary<string, string> Metadatas { get; set; } = [];
     }
 }
