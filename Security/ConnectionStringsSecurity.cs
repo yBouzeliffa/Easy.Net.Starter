@@ -26,7 +26,7 @@ namespace Easy.Net.Starter.Security
                 if (Console.IsInputRedirected)
                 {
                     throw new InvalidOperationException(
-                        $"La variable d'environnement {envVarName} n'est pas définie et l'entrée interactive n'est pas disponible.");
+                        $"The environment variable {envVarName} is not defined and interactive input is not available.");
                 }
                 else
                 {
@@ -45,7 +45,7 @@ namespace Easy.Net.Starter.Security
                 }
             }
 
-            ArgumentException.ThrowIfNullOrEmpty(password, "Le mot de passe de la base de données n'est pas défini.");
+            ArgumentException.ThrowIfNullOrEmpty(password, "The database password is not set.");
 
             return password;
         }

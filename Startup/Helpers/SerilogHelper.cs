@@ -1,17 +1,11 @@
-﻿using Easy.Net.Starter.Models;
+﻿using Easy.Net.Starter.Extensions;
+using Easy.Net.Starter.Models;
 using Microsoft.Extensions.Configuration;
-using System.Reflection;
 
 namespace Easy.Net.Starter.Startup.Helpers
 {
     public static class SerilogHelper
     {
-
-        public static string GetApplicationName()
-        {
-            return Assembly.GetEntryAssembly()?.GetName()?.Name ?? "UnknownApp";
-        }
-
         public static ArgsSection ExtractConfiguration(IConfiguration configuration)
         {
             var rollingIntervalString = configuration["Serilog:WriteTo:1:Args:rollingInterval"];
@@ -29,7 +23,7 @@ namespace Easy.Net.Starter.Startup.Helpers
                 FileSizeLimitBytes = fileSizeLimit,
                 RetainedFileCountLimit = retainedFileCount,
                 RollingInterval = rollingIntervalString,
-                Path = path.Replace("{APP_NAME}", GetApplicationName())
+                Path = path.Replace("{APP_NAME}", AppExtensions.GetApplicationName())
             };
         }
     }
