@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Easy.Net.Starter.Security
 {
-    public enum EmailApiKey
+    public enum EmailProvider
     {
         [Description("SENDGRID")]
         SendGrid
@@ -13,7 +13,7 @@ namespace Easy.Net.Starter.Security
 
     public class EmailApiKeySecurity
     {
-        public static string GetApiKey(EmailApiKey emailApiKey)
+        public static string GetApiKey(EmailProvider emailApiKey)
         {
             string envVarName = $"{emailApiKey.GetDescription()}_{AppExtensions.GetApplicationName().ToUpper()}";
 

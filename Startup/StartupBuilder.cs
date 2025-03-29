@@ -1,4 +1,5 @@
 ﻿using Easy.Net.Starter.EntityFramework;
+using Easy.Net.Starter.Security;
 
 namespace Easy.Net.Starter.Startup
 {
@@ -17,6 +18,15 @@ namespace Easy.Net.Starter.Startup
         private bool _useSignalR = false;
         private bool _useHttpLoggerMiddleware = false;
         private bool _useJwtAuthentication = false;
+        private bool _useEmailingService = false;
+        private EmailProvider _emailProvider = EmailProvider.SendGrid;
+
+        public StartupBuilder AddEmailingService(EmailProvider emailProvider)
+        {
+            _useEmailingService = true;
+            _emailProvider = emailProvider;
+            return this;
+        }
 
         public StartupBuilder AddDefaultGenericLogger()
         {
@@ -97,6 +107,8 @@ namespace Easy.Net.Starter.Startup
         {
             return new StartupOptions
             {
+                UseEmailingService = _useEmailingService,
+                EmailProvider = _emailProvider,
                 UseDefaultGenericLogger = _useDefaultGenericLogger,
                 UseJwtAuthentication = _useJwtAuthentication,
                 UseHttpLoggerMiddleware = _useHttpLoggerMiddleware,

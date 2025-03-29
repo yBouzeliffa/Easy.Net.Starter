@@ -22,7 +22,10 @@ namespace Easy.Net.Starter.Startup.Entries
 
                 ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
 
-                var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(configuration);
+                var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(
+                    configuration,
+                    options.UseEmailingService,
+                    options.EmailProvider);
 
                 builder.Services.AddSerilogConsoleApp(configuration);
 

@@ -1,6 +1,7 @@
 ﻿using Easy.Net.Starter.EntityFramework;
 using Easy.Net.Starter.Extensions;
 using Easy.Net.Starter.Models;
+using Easy.Net.Starter.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Easy.Net.Starter.Api.Authentications
@@ -21,9 +22,11 @@ namespace Easy.Net.Starter.Api.Authentications
 
         Task<UserLight[]> GetAllUsersAsync(CancellationToken cancellationToken);
     }
-    public class UserService(BaseDbContext context) : IUserService
+    public class UserService(BaseDbContext context, IEmailService emailService, AppSettings appSettings) : IUserService
     {
         private readonly BaseDbContext _context = context;
+        private readonly IEmailService emailService = emailService;
+        private readonly AppSettings appSettings = appSettings;
 
         public async Task<Guid> GetIdByEmail(string email)
         {
@@ -68,6 +71,18 @@ namespace Easy.Net.Starter.Api.Authentications
         {
             try
             {
+                EmailValidation[] emailValidations = [];
+                var emailValidation = new EmailValidation
+                {
+                    Token = Guid.NewGuid().ToString(),
+                    ExpiresAt = DateTime.UtcNow.AddHours(24),
+                };
+
+                if (appSettings.EmailApiKey is not null)
+                {
+                    emailValidations = [emailValidation];
+                }
+
                 var newUser = new User
                 {
                     Email = email,
@@ -77,11 +92,18 @@ namespace Easy.Net.Starter.Api.Authentications
                     PhoneNumber = phoneNumber,
                     DateOfBirth = DateOnly.FromDateTime(dateOfBirth),
                     IsAdmin = false,
-                    IsLocked = isLocked
+                    IsLocked = isLocked,
+                    EmailValidations = emailValidations,
                 };
 
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
+
+                if (appSettings.EmailApiKey is not null)
+                {
+                    await emailService.SendWelcomeEmailAsync(email, firstName, appSettings.MobileAppRedirection);
+                    await emailService.SendEmailValidationAsync(email, firstName, emailValidation.GenerateLink(appSettings.ApiBaseUrl));
+                }
 
                 return true;
             }

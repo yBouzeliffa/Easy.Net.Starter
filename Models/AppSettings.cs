@@ -5,6 +5,7 @@ namespace Easy.Net.Starter.Models
     public partial class AppSettings
     {
         public string OverrideWriteLogToFile { get; set; } = string.Empty;
+        public string EmailApiKey { get; set; } = string.Empty;
         public LoggingSection Logging { get; set; } = new();
         public SerilogSection Serilog { get; set; } = new();
         public string AllowedOrigins { get; set; } = string.Empty;
@@ -12,6 +13,8 @@ namespace Easy.Net.Starter.Models
         public string AllowedMethods { get; set; } = string.Empty;
         public string Version { get; set; } = string.Empty;
         public string DatabaseBackupPath { get; set; } = string.Empty;
+        public string ApiBaseUrl { get; set; } = string.Empty;
+        public string MobileAppRedirection { get; set; } = string.Empty;
 
         public ConnectionStringsSection ConnectionStrings { get; set; } = new();
         public JwtSection Jwt { get; set; } = new("", "", "", 0);

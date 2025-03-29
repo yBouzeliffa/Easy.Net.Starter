@@ -17,5 +17,10 @@
         public DateTime? VerifiedAt { get; set; }
 
         public virtual User User { get; set; }
+
+        public string GenerateLink(string baseUrl)
+        {
+            return $"{baseUrl}/verify-email/{Token}";
+        }
     }
 }

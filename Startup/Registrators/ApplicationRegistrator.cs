@@ -14,7 +14,7 @@ namespace Easy.Net.Starter.Startup.Registrators
     public static class ApplicationRegistrator
     {
         public static TAppSettings RegisterAppSettings<TAppSettings>(
-            this IServiceCollection services, IConfiguration configuration)
+            this IServiceCollection services, IConfiguration configuration, bool useEmailingService, EmailProvider emailProvider)
             where TAppSettings : AppSettings, new()
         {
             try
@@ -25,7 +25,12 @@ namespace Easy.Net.Starter.Startup.Registrators
 
                 // Also Register the appsettings for core api workload
                 var appSettings = configurationSettings as AppSettings;
+
                 configuration.Bind(appSettings);
+
+                if (useEmailingService)
+                    appSettings.EmailApiKey = EmailApiKeySecurity.GetApiKey(emailProvider);
+
                 services.AddSingleton(appSettings);
 
                 Log.Logger?.Information("Appsettings registered");

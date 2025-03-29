@@ -1,4 +1,6 @@
-﻿namespace Easy.Net.Starter.Startup
+﻿using Easy.Net.Starter.Security;
+
+namespace Easy.Net.Starter.Startup
 {
     public class StartupOptions
     {
@@ -8,6 +10,8 @@
         public bool UseSignalR { get; set; }
         public bool UseDatabase { get; set; }
         public bool UseDatabaseWithBuiltInUserConfiguration { get; set; }
+        public bool UseEmailingService { get; set; }
+        public EmailProvider EmailProvider { get; set; }
         public Type? DatabaseContextType { get; set; }
         public string[] Middlewares { get; set; } = Array.Empty<string>();
         public string[] SingletonServices { get; set; } = Array.Empty<string>();

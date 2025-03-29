@@ -22,7 +22,10 @@ namespace Easy.Net.Starter.Startup.Entries
 
                 builder.CheckAspNetCoreEnvironment();
 
-                var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(builder.Configuration);
+                var appSettings = builder.Services.RegisterAppSettings<TAppSettings>(
+                    builder.Configuration,
+                    options.UseEmailingService,
+                    options.EmailProvider);
 
                 ArgumentNullException.ThrowIfNull(appSettings, nameof(appSettings));
                 ArgumentException.ThrowIfNullOrEmpty(appSettings.Version, nameof(appSettings.Version));
