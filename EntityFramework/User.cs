@@ -21,4 +21,8 @@ public partial class User
     public bool IsAdmin { get; set; }
 
     public bool IsLocked { get; set; }
+
+    public virtual ICollection<EmailValidation> EmailValidations { get; set; } = [];
+
+    public virtual ICollection<TwoFactorCode> TwoFactorCodes { get; set; } = [];
 }
